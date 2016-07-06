@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.Serialization;
-using System.Web.Http;
 using Microsoft.OData.Core;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -11,7 +10,7 @@ using Microsoft.AspNetCore.OData.Extensions;
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
     /// <summary>
-    /// Represents an <see cref="ODataSerializer"/> to serialize <see cref="ODataError"/>s and <see cref="HttpError"/>s.
+    /// Represents an <see cref="ODataSerializer"/> to serialize <see cref="ODataError"/>s=.
     /// </summary>
     public class ODataErrorSerializer : ODataSerializer
     {
@@ -38,16 +37,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataError oDataError = graph as ODataError;
             if (oDataError == null)
             {
-                HttpError httpError = graph as HttpError;
-                if (httpError == null)
-                {
-                    string message = Error.Format(SRResources.ErrorTypeMustBeODataErrorOrHttpError, graph.GetType().FullName);
-                    throw new SerializationException(message);
-                }
-                else
-                {
-                    oDataError = httpError.CreateODataError();
-                }
+                string message = Error.Format(SRResources.ErrorTypeMustBeODataErrorOrHttpError, graph.GetType().FullName);
+                throw new SerializationException(message);
+                
             }
 
             bool includeDebugInformation = oDataError.InnerError != null;

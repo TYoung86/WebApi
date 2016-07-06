@@ -6,7 +6,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using System.Web.Http;
 
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.OData.Common;
@@ -130,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 return _entityReferenceLinksSerializer;
             }
-            else if (type == typeof(ODataError) || type == typeof(HttpError))
+            else if (type == typeof(ODataError))
             {
                 return _errorSerializer;
             }
