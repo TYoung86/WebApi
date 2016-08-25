@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             HandleNullPropagationOption options;
 
-            string queryProviderNamespace = query.Provider.GetType().Namespace;
+            var queryProviderNamespace = query.Provider.GetType().Namespace;
             switch (queryProviderNamespace)
             {
                 case EntityFrameworkQueryProviderNamespace:

@@ -122,10 +122,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw new ArgumentNullException("payloadUri");
             }
 
-            string originalPayloadUri = payloadUri.OriginalString;
+            var originalPayloadUri = payloadUri.OriginalString;
             if (ContentIdReferencePattern.IsMatch(originalPayloadUri))
             {
-                string resolvedUri = ContentIdHelpers.ResolveContentId(originalPayloadUri, _contentIdMapping);
+                var resolvedUri = ContentIdHelpers.ResolveContentId(originalPayloadUri, _contentIdMapping);
                 return new Uri(resolvedUri, UriKind.RelativeOrAbsolute);
             }
 

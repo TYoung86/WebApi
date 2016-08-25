@@ -43,17 +43,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull("writeContext");
             }
 
-            IEdmEntitySetBase entitySet = writeContext.NavigationSource as IEdmEntitySetBase;
+            var entitySet = writeContext.NavigationSource as IEdmEntitySetBase;
             if (entitySet == null)
             {
                 throw new SerializationException(SRResources.EntitySetMissingDuringSerialization);
             }
 
-            IEdmTypeReference feedType = writeContext.GetEdmType(graph, type);
+            var feedType = writeContext.GetEdmType(graph, type);
             Contract.Assert(feedType != null);
 
-            IEdmEntityTypeReference entityType = GetEntityType(feedType);
-            ODataWriter writer = messageWriter.CreateODataFeedWriter(entitySet, entityType.EntityDefinition());
+            var entityType = GetEntityType(feedType);
+            var writer = messageWriter.CreateODataFeedWriter(entitySet, entityType.EntityDefinition());
             WriteObjectInline(graph, feedType, writer, writeContext);
         }
 
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, Feed));
             }
 
-            IEnumerable enumerable = graph as IEnumerable; // Data to serialize
+            var enumerable = graph as IEnumerable; // Data to serialize
             if (enumerable == null)
             {
                 throw new SerializationException(
@@ -96,14 +96,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(enumerable != null);
             Contract.Assert(feedType != null);
 
-            IEdmEntityTypeReference elementType = GetEntityType(feedType);
-            ODataFeed feed = CreateODataFeed(enumerable, feedType.AsCollection(), writeContext);
+            var elementType = GetEntityType(feedType);
+            var feed = CreateODataFeed(enumerable, feedType.AsCollection(), writeContext);
             if (feed == null)
             {
                 throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, Feed));
             }
 
-            ODataEdmTypeSerializer entrySerializer = SerializerProvider.GetEdmTypeSerializer(elementType);
+            var entrySerializer = SerializerProvider.GetEdmTypeSerializer(elementType);
             if (entrySerializer == null)
             {
                 throw new SerializationException(
@@ -111,12 +111,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             // save this for later to support JSON odata.streaming.
-            Uri nextPageLink = feed.NextPageLink;
+            var nextPageLink = feed.NextPageLink;
             feed.NextPageLink = null;
 
             writer.WriteStart(feed);
 
-            foreach (object entry in enumerable)
+            foreach (var entry in enumerable)
             {
                 if (entry == null)
                 {
@@ -150,12 +150,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public virtual ODataFeed CreateODataFeed(IEnumerable feedInstance, IEdmCollectionTypeReference feedType,
             ODataSerializerContext writeContext)
         {
-            ODataFeed feed = new ODataFeed();
+            var feed = new ODataFeed();
 
             if (writeContext.ExpandedEntity == null)
             {
                 // If we have more OData format specific information apply it now, only if we are the root feed.
-                PageResult odataFeedAnnotations = feedInstance as PageResult;
+                var odataFeedAnnotations = feedInstance as PageResult;
                 if (odataFeedAnnotations != null)
                 {
                     feed.Count = odataFeedAnnotations.Count;
@@ -165,7 +165,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     feed.NextPageLink = writeContext.Request.ODataProperties().NextLink;
 
-                    long? countValue = writeContext.Request.ODataProperties().TotalCount;
+                    var countValue = writeContext.Request.ODataProperties().TotalCount;
                     if (countValue.HasValue)
                     {
                         feed.Count = countValue.Value;
@@ -175,7 +175,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             else
             {
                 // nested feed
-                ITruncatedCollection truncatedCollection = feedInstance as ITruncatedCollection;
+                var truncatedCollection = feedInstance as ITruncatedCollection;
                 if (truncatedCollection != null && truncatedCollection.IsTruncated)
                 {
                     feed.NextPageLink = GetNestedNextPageLink(writeContext, truncatedCollection.PageSize);
@@ -189,9 +189,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             Contract.Assert(writeContext.ExpandedEntity != null);
 
-            IEdmNavigationSource sourceNavigationSource = writeContext.ExpandedEntity.NavigationSource;
-            NavigationSourceLinkBuilderAnnotation linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
-            Uri navigationLink =
+            var sourceNavigationSource = writeContext.ExpandedEntity.NavigationSource;
+            var linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
+            var navigationLink =
                 linkBuilder.BuildNavigationLink(writeContext.ExpandedEntity, writeContext.NavigationProperty);
 
             if (navigationLink != null)
@@ -207,14 +207,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (feedType.IsCollection())
             {
-                IEdmTypeReference elementType = feedType.AsCollection().ElementType();
+                var elementType = feedType.AsCollection().ElementType();
                 if (elementType.IsEntity())
                 {
                     return elementType.AsEntity();
                 }
             }
 
-            string message = Error.Format(SRResources.CannotWriteType, typeof(ODataFeedSerializer).Name, feedType.FullName());
+            var message = Error.Format(SRResources.CannotWriteType, typeof(ODataFeedSerializer).Name, feedType.FullName());
             throw new SerializationException(message);
         }
     }

@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.Singleton)
             {
-                SingletonPathSegment singletonSegment = (SingletonPathSegment)pathSegment;
+                var singletonSegment = (SingletonPathSegment)pathSegment;
                 return singletonSegment.Singleton == Singleton && singletonSegment.SingletonName == SingletonName;
             }
 

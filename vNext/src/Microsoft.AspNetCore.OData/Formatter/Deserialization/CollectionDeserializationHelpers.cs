@@ -30,20 +30,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(propertyType != null);
 
             MethodInfo addMethod = null;
-            IList list = collection as IList;
+            var list = collection as IList;
 
             if (list == null)
             {
                 addMethod = collection.GetType().GetMethod("Add", new Type[] { elementType });
                 if (addMethod == null)
                 {
-                    string message = Error.Format(SRResources.CollectionShouldHaveAddMethod, propertyType.FullName, propertyName, resourceType.FullName);
+                    var message = Error.Format(SRResources.CollectionShouldHaveAddMethod, propertyType.FullName, propertyName, resourceType.FullName);
                     throw new SerializationException(message);
                 }
             }
             else if (list.GetType().IsArray)
             {
-                string message = Error.Format(SRResources.GetOnlyCollectionCannotBeArray, propertyName, resourceType.FullName);
+                var message = Error.Format(SRResources.GetOnlyCollectionCannotBeArray, propertyName, resourceType.FullName);
                 throw new SerializationException(message);
             }
 
@@ -58,14 +58,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(paramType != null);
 
             MethodInfo addMethod = null;
-            IList list = collection as IList;
+            var list = collection as IList;
 
             if (list == null)
             {
                 addMethod = collection.GetType().GetMethod("Add", new Type[] { elementType });
                 if (addMethod == null)
                 {
-                    string message = Error.Format(SRResources.CollectionParameterShouldHaveAddMethod, paramType, paramName);
+                    var message = Error.Format(SRResources.CollectionParameterShouldHaveAddMethod, paramType, paramName);
                     throw new SerializationException(message);
                 }
             }
@@ -78,9 +78,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             bool isNonstandardEdmPrimitiveCollection;
             EdmLibHelpers.IsNonstandardEdmPrimitive(elementType, out isNonstandardEdmPrimitiveCollection);
 
-            foreach (object item in items)
+            foreach (var item in items)
             {
-                object element = item;
+                var element = item;
 
                 if (isNonstandardEdmPrimitiveCollection && element != null)
                 {
@@ -104,10 +104,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             Contract.Assert(collection != null);
 
-            MethodInfo clearMethod = collection.GetType().GetMethod("Clear", _emptyTypeArray);
+            var clearMethod = collection.GetType().GetMethod("Clear", _emptyTypeArray);
             if (clearMethod == null)
             {
-                string message = Error.Format(SRResources.CollectionShouldHaveClearMethod, collection.GetType().FullName,
+                var message = Error.Format(SRResources.CollectionShouldHaveClearMethod, collection.GetType().FullName,
                     propertyName, resourceType.FullName);
                 throw new SerializationException(message);
             }
@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else if (collectionType.GetTypeInfo().IsGenericType)
             {
-                Type genericDefinition = collectionType.GetGenericTypeDefinition();
+                var genericDefinition = collectionType.GetGenericTypeDefinition();
                 if (genericDefinition == typeof(IEnumerable<>) ||
                     genericDefinition == typeof(ICollection<>) ||
                     genericDefinition == typeof(IList<>))

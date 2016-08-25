@@ -32,11 +32,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return null;
             }
 
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             builder.Append('\"');
-            bool firstProperty = true;
+            var firstProperty = true;
 
-            foreach (object propertyValue in properties.Values)
+            foreach (var propertyValue in properties.Values)
             {
                 if (firstProperty)
                 {
@@ -47,18 +47,18 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     builder.Append(Separator);
                 }
 
-                string str = propertyValue == null
+                var str = propertyValue == null
                     ? NullLiteralInETag
                     : ConventionsHelpers.GetUriRepresentationForValue(propertyValue);
 
                 // base64 encode
-                byte[] bytes = Encoding.UTF8.GetBytes(str);
-                string etagValueText = Convert.ToBase64String(bytes);
+                var bytes = Encoding.UTF8.GetBytes(str);
+                var etagValueText = Convert.ToBase64String(bytes);
                 builder.Append(etagValueText);
             }
 
             builder.Append('\"');
-            string tag = builder.ToString();
+            var tag = builder.ToString();
             return new EntityTagHeaderValue(tag, isWeak: true);
         }
 
@@ -69,19 +69,19 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("etagHeaderValue");
             }
 
-            string tag = etagHeaderValue.Tag.Trim('\"');
+            var tag = etagHeaderValue.Tag.Trim('\"');
 
             // split etag
-            string[] rawValues = tag.Split(Separator);
+            var rawValues = tag.Split(Separator);
             IDictionary<string, object> properties = new Dictionary<string, object>();
-            for (int index = 0; index < rawValues.Length; index++)
+            for (var index = 0; index < rawValues.Length; index++)
             {
-                string rawValue = rawValues[index];
+                var rawValue = rawValues[index];
 
                 // base64 decode
-                byte[] bytes = Convert.FromBase64String(rawValue);
-                string valueString = Encoding.UTF8.GetString(bytes);
-                object obj = ODataUriUtils.ConvertFromUriLiteral(valueString, ODataVersion.V4);
+                var bytes = Convert.FromBase64String(rawValue);
+                var valueString = Encoding.UTF8.GetString(bytes);
+                var obj = ODataUriUtils.ConvertFromUriLiteral(valueString, ODataVersion.V4);
                 if (obj is ODataNullValue)
                 {
                     obj = null;

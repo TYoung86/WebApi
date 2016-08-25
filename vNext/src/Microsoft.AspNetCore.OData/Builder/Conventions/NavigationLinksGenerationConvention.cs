@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
             // generate links without cast for declared and inherited navigation properties
             foreach (EntityTypeConfiguration entity in configuration.EntityType.ThisAndBaseTypes())
             {
-                foreach (NavigationPropertyConfiguration property in entity.NavigationProperties)
+                foreach (var property in entity.NavigationProperties)
                 {
                     if (configuration.GetNavigationPropertyLink(property) == null)
                     {
@@ -31,9 +31,9 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
             }
 
             // generate links with cast for navigation properties in derived types.
-            foreach (EntityTypeConfiguration entity in model.DerivedTypes(configuration.EntityType))
+            foreach (var entity in model.DerivedTypes(configuration.EntityType))
             {
-                foreach (NavigationPropertyConfiguration property in entity.NavigationProperties)
+                foreach (var property in entity.NavigationProperties)
                 {
                     if (configuration.GetNavigationPropertyLink(property) == null)
                     {

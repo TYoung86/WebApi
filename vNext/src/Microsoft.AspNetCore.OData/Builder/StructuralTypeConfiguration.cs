@@ -237,12 +237,12 @@ namespace Microsoft.AspNetCore.OData.Builder
                     ClrType.FullName, baseType.ClrType.FullName);
             }
 
-            foreach (PropertyConfiguration property in Properties)
+            foreach (var property in Properties)
             {
                 ValidatePropertyNotAlreadyDefinedInBaseTypes(property.PropertyInfo);
             }
 
-            foreach (PropertyConfiguration property in this.DerivedProperties())
+            foreach (var property in this.DerivedProperties())
             {
                 ValidatePropertyNotAlreadyDefinedInDerivedTypes(property.PropertyInfo);
             }
@@ -444,7 +444,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 }
 
                 // If the ElementType is not primitive or enum treat as a ComplexType and Add to the model.
-                IEdmPrimitiveTypeReference edmType =
+                var edmType =
                     EdmLibHelpers.GetEdmPrimitiveTypeReferenceOrNull(propertyConfiguration.ElementType);
                 if (edmType == null)
                 {
@@ -528,7 +528,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         internal void ValidatePropertyNotAlreadyDefinedInBaseTypes(PropertyInfo propertyInfo)
         {
-            PropertyConfiguration baseProperty =
+            var baseProperty =
                 this.DerivedProperties().FirstOrDefault(p => p.Name == propertyInfo.Name);
             if (baseProperty != null)
             {
@@ -539,9 +539,9 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         internal void ValidatePropertyNotAlreadyDefinedInDerivedTypes(PropertyInfo propertyInfo)
         {
-            foreach (StructuralTypeConfiguration derivedType in ModelBuilder.DerivedTypes(this))
+            foreach (var derivedType in ModelBuilder.DerivedTypes(this))
             {
-                PropertyConfiguration propertyInDerivedType =
+                var propertyInDerivedType =
                     derivedType.Properties.FirstOrDefault(p => p.Name == propertyInfo.Name);
                 if (propertyInDerivedType != null)
                 {

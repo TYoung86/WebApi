@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             Justification = "typeof(TBaseType) is used and getting it as a generic argument is cleaner")]
         public ComplexTypeConfiguration<TComplexType> DerivesFrom<TBaseType>() where TBaseType : class
         {
-            ComplexTypeConfiguration<TBaseType> baseEntityType = _modelBuilder.ComplexType<TBaseType>();
+            var baseEntityType = _modelBuilder.ComplexType<TBaseType>();
             _configuration.DerivesFrom(baseEntityType._configuration);
             return this;
         }

@@ -20,15 +20,15 @@ namespace Microsoft.AspNetCore.OData.Routing
         // TODO 1656: Make this method support more format in OData Uri BNF
         public static Dictionary<string, string> ParseKeys(string segment)
         {
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            int currentIndex = 0;
-            int startIndex = 0;
+            var dictionary = new Dictionary<string, string>();
+            var currentIndex = 0;
+            var startIndex = 0;
 
             while (currentIndex < segment.Length)
             {
                 if (segment[currentIndex] == '=')
                 {
-                    string key = segment.Substring(startIndex, currentIndex - startIndex);
+                    var key = segment.Substring(startIndex, currentIndex - startIndex);
 
                     if (String.IsNullOrWhiteSpace(key))
                     {
@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                     {
                         if (currentIndex == segment.Length || segment[currentIndex] == ',')
                         {
-                            string value = segment.Substring(startIndex, currentIndex - startIndex);
+                            var value = segment.Substring(startIndex, currentIndex - startIndex);
 
                             if (String.IsNullOrWhiteSpace(value))
                             {
@@ -138,7 +138,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
             else
             {
-                int singleQuoteCount = value.Count(c => c == '\'');
+                var singleQuoteCount = value.Count(c => c == '\'');
 
                 if (singleQuoteCount != 0 && singleQuoteCount != 2)
                 {

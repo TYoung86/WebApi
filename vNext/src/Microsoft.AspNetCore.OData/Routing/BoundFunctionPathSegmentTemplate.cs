@@ -46,17 +46,17 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.Function)
             {
-                BoundFunctionPathSegment functionSegment = (BoundFunctionPathSegment)pathSegment;
+                var functionSegment = (BoundFunctionPathSegment)pathSegment;
                 if (FunctionName == functionSegment.FunctionName)
                 {
                     var enumNames = functionSegment.Function.Parameters.Where(p => p.Type.IsEnum()).Select(p => p.Name);
                     if (KeyValuePathSegmentTemplate.TryMatch(ParameterMappings, functionSegment.Values, values,
                         enumNames))
                     {
-                        foreach (KeyValuePair<string, string> nameAndValue in functionSegment.Values)
+                        foreach (var nameAndValue in functionSegment.Values)
                         {
-                            string name = nameAndValue.Key;
-                            object value = functionSegment.GetParameterValue(name);
+                            var name = nameAndValue.Key;
+                            var value = functionSegment.GetParameterValue(name);
 
                             //ProcedureRoutingConventionHelpers.AddFunctionParameters(functionSegment.Function, name,
                             //    value, values, values, ParameterMappings);

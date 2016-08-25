@@ -102,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.Property)
             {
-                PropertyAccessPathSegment propertySegment = (PropertyAccessPathSegment)pathSegment;
+                var propertySegment = (PropertyAccessPathSegment)pathSegment;
                 return propertySegment.Property == Property && propertySegment.PropertyName == PropertyName;
             }
 

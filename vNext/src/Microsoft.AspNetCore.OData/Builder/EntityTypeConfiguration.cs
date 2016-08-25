@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         /// <summary>
         /// Gets the collection of keys for this entity type.
         /// </summary>
-        public virtual IEnumerable<PrimitivePropertyConfiguration> Keys
+        public virtual ICollection<PrimitivePropertyConfiguration> Keys
         {
             get
             {
@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             if (keyProperty.PropertyType.GetTypeInfo().IsEnum)
             {
                 ModelBuilder.AddEnumType(keyProperty.PropertyType);
-                EnumPropertyConfiguration enumConfig = AddEnumProperty(keyProperty);
+                var enumConfig = AddEnumProperty(keyProperty);
 
                 // keys are always required
                 enumConfig.IsRequired();
@@ -131,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             }
             else
             {
-                PrimitivePropertyConfiguration propertyConfig = AddProperty(keyProperty);
+                var propertyConfig = AddProperty(keyProperty);
 
                 // keys are always required
                 propertyConfig.IsRequired();
@@ -195,10 +195,12 @@ namespace Microsoft.AspNetCore.OData.Builder
         /// <returns>Returns itself so that multiple calls can be chained.</returns>
         public virtual EntityTypeConfiguration DerivesFrom(EntityTypeConfiguration baseType)
         {
+			/* do we actually care about this?
             if ((Keys.Any() || EnumKeys.Any()) && baseType.Keys().Any())
             {
                 throw Error.InvalidOperation(SRResources.CannotDefineKeysOnDerivedTypes, FullName, baseType.FullName);
             }
+			*/
 
             DerivesFromImpl(baseType);
             return this;

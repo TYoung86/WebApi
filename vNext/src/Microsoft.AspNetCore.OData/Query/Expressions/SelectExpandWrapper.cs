@@ -54,11 +54,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <inheritdoc />
         public IEdmTypeReference GetEdmType()
         {
-            IEdmModel model = GetModel();
+            var model = GetModel();
 
             if (TypeName != null)
             {
-                IEdmEntityType entityType = model.FindDeclaredType(TypeName) as IEdmEntityType;
+                var entityType = model.FindDeclaredType(TypeName) as IEdmEntityType;
                 if (entityType == null)
                 {
                     throw Error.InvalidOperation(SRResources.EntityTypeNotInModel, TypeName);
@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
-                Type elementType = GetElementType();
+                var elementType = GetElementType();
                 return model.GetEdmTypeReference(elementType);
             }
         }
@@ -112,10 +112,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull("mapperProvider");
             }
 
-            Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            IEdmStructuredType type = GetEdmType().AsStructured().StructuredDefinition();
+            var dictionary = new Dictionary<string, object>();
+            var type = GetEdmType().AsStructured().StructuredDefinition();
 
-            IPropertyMapper mapper = mapperProvider(GetModel(), type);
+            var mapper = mapperProvider(GetModel(), type);
             if (mapper == null)
             {
                 throw Error.InvalidOperation(SRResources.InvalidPropertyMapper, typeof(IPropertyMapper).FullName,
@@ -130,12 +130,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // The user asked for all the structural properties on this instance.
             if (Instance != null)
             {
-                foreach (IEdmStructuralProperty property in type.StructuralProperties())
+                foreach (var property in type.StructuralProperties())
                 {
                     object propertyValue;
                     if (TryGetPropertyValue(property.Name, out propertyValue))
                     {
-                        string mappingName = mapper.MapProperty(property.Name);
+                        var mappingName = mapper.MapProperty(property.Name);
                         if (String.IsNullOrWhiteSpace(mappingName))
                         {
                             throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, property.Name);

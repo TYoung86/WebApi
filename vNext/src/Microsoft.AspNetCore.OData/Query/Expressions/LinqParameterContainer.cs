@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // () => new LinqParameterContainer(constant).Property
             // instead of returning a constant expression node, wrap that constant in a class the way compiler 
             // does a closure, so that EF can parameterize the constant (resulting in better performance due to expression translation caching).
-            LinqParameterContainer containedValue = LinqParameterContainer.Create(type, value);
+            var containedValue = LinqParameterContainer.Create(type, value);
             return Expression.Property(Expression.Constant(containedValue), "TypedProperty");
         }
 
@@ -26,8 +26,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             return _ctors.GetOrAdd(type, t =>
             {
-                MethodInfo createMethod = typeof(LinqParameterContainer).GetMethod("CreateInternal").MakeGenericMethod(t);
-                ParameterExpression valueParameter = Expression.Parameter(typeof(object));
+                var createMethod = typeof(LinqParameterContainer).GetMethod("CreateInternal").MakeGenericMethod(t);
+                var valueParameter = Expression.Parameter(typeof(object));
                 return
                     Expression.Lambda<Func<object, LinqParameterContainer>>(
                         Expression.Call(

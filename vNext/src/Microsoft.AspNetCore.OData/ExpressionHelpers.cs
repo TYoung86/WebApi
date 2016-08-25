@@ -18,14 +18,14 @@ namespace Microsoft.AspNetCore.OData
     {
         public static long Count(IQueryable query, Type type)
         {
-            MethodInfo countMethod = ExpressionHelperMethods.QueryableCountGeneric.MakeGenericMethod(type);
+            var countMethod = ExpressionHelperMethods.QueryableCountGeneric.MakeGenericMethod(type);
             return (long)countMethod.Invoke(null, new object[] { query });
         }
 
         public static IQueryable Skip(IQueryable query, int count, Type type, bool parameterize)
         {
-            MethodInfo skipMethod = ExpressionHelperMethods.QueryableSkipGeneric.MakeGenericMethod(type);
-            Expression skipValueExpression = parameterize ? LinqParameterContainer.Parameterize(typeof(int), count) : Expression.Constant(count);
+            var skipMethod = ExpressionHelperMethods.QueryableSkipGeneric.MakeGenericMethod(type);
+            var skipValueExpression = parameterize ? LinqParameterContainer.Parameterize(typeof(int), count) : Expression.Constant(count);
 
             Expression skipQuery = Expression.Call(null, skipMethod, new[] { query.Expression, skipValueExpression });
             return query.Provider.CreateQuery(skipQuery);
@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData
 
         public static IQueryable Take(IQueryable query, int count, Type type, bool parameterize)
         {
-            Expression takeQuery = Take(query.Expression, count, type, parameterize);
+            var takeQuery = Take(query.Expression, count, type, parameterize);
             return query.Provider.CreateQuery(takeQuery);
         }
 
@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData
                 takeMethod = ExpressionHelperMethods.EnumerableTakeGeneric.MakeGenericMethod(elementType);
             }
 
-            Expression takeValueExpression = parameterize ? LinqParameterContainer.Parameterize(typeof(int), count) : Expression.Constant(count);
+            var takeValueExpression = parameterize ? LinqParameterContainer.Parameterize(typeof(int), count) : Expression.Constant(count);
             Expression takeQuery = Expression.Call(null, takeMethod, new[] { source, takeValueExpression });
             return takeQuery;
         }
@@ -60,8 +60,8 @@ namespace Microsoft.AspNetCore.OData
             Type elementType,
             bool alreadyOrdered = false)
         {
-            LambdaExpression orderByLambda = GetPropertyAccessLambda(elementType, propertyName);
-            Type returnType = orderByLambda.Body.Type;
+            var orderByLambda = GetPropertyAccessLambda(elementType, propertyName);
+            var returnType = orderByLambda.Body.Type;
             MethodInfo orderByMethod;
 
             if (!alreadyOrdered)
@@ -95,22 +95,22 @@ namespace Microsoft.AspNetCore.OData
 
         public static IQueryable OrderByIt(IQueryable query, OrderByDirection direction, Type type, bool alreadyOrdered = false)
         {
-            ParameterExpression odataItParameter = Expression.Parameter(type, "$it");
-            LambdaExpression orderByLambda = Expression.Lambda(odataItParameter, odataItParameter);
+            var odataItParameter = Expression.Parameter(type, "$it");
+            var orderByLambda = Expression.Lambda(odataItParameter, odataItParameter);
             return OrderBy(query, orderByLambda, direction, type, alreadyOrdered);
         }
 
         public static IQueryable OrderByProperty(IQueryable query, IEdmModel model, IEdmProperty property, OrderByDirection direction, Type type, bool alreadyOrdered = false)
         {
             // property aliasing
-            string propertyName = EdmLibHelpers.GetClrPropertyName(property, model);
-            LambdaExpression orderByLambda = GetPropertyAccessLambda(type, propertyName);
+            var propertyName = EdmLibHelpers.GetClrPropertyName(property, model);
+            var orderByLambda = GetPropertyAccessLambda(type, propertyName);
             return OrderBy(query, orderByLambda, direction, type, alreadyOrdered);
         }
 
         public static IQueryable OrderBy(IQueryable query, LambdaExpression orderByLambda, OrderByDirection direction, Type type, bool alreadyOrdered = false)
         {
-            Type returnType = orderByLambda.Body.Type;
+            var returnType = orderByLambda.Body.Type;
 
             MethodInfo orderByMethod = null;
             IOrderedQueryable orderedQuery = null;
@@ -151,7 +151,7 @@ namespace Microsoft.AspNetCore.OData
 
         public static IQueryable Where(IQueryable query, Expression where, Type type)
         {
-            MethodInfo whereMethod = ExpressionHelperMethods.QueryableWhereGeneric.MakeGenericMethod(type);
+            var whereMethod = ExpressionHelperMethods.QueryableWhereGeneric.MakeGenericMethod(type);
             return whereMethod.Invoke(null, new object[] { query, where }) as IQueryable;
         }
 
@@ -181,8 +181,8 @@ namespace Microsoft.AspNetCore.OData
 
         private static LambdaExpression GetPropertyAccessLambda(Type type, string propertyName)
         {
-            ParameterExpression odataItParameter = Expression.Parameter(type, "$it");
-            MemberExpression propertyAccess = Expression.Property(odataItParameter, propertyName);
+            var odataItParameter = Expression.Parameter(type, "$it");
+            var propertyAccess = Expression.Property(odataItParameter, propertyName);
             return Expression.Lambda(propertyAccess, odataItParameter);
         }
     }

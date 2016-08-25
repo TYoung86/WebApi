@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull("navigationProperty");
             }
 
-            ODataSerializerContext context = entity.SerializerContext;
+            var context = entity.SerializerContext;
 
             Request = context.Request;
             RequestContext = context.RequestContext;
@@ -147,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             IEdmTypeReference edmType;
 
-            IEdmObject edmObject = instance as IEdmObject;
+            var edmObject = instance as IEdmObject;
             if (edmObject != null)
             {
                 edmType = edmObject.GetEdmType();
@@ -181,7 +181,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
                 else if (instance != null)
                 {
-                    IEdmTypeReference actualType = _typeMappingCache.GetEdmType(instance.GetType(), Model);
+                    var actualType = _typeMappingCache.GetEdmType(instance.GetType(), Model);
                     if (actualType != null && actualType != edmType)
                     {
                         edmType = actualType;

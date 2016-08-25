@@ -117,7 +117,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.Cast)
             {
-                CastPathSegment castSegment = (CastPathSegment)pathSegment;
+                var castSegment = (CastPathSegment)pathSegment;
                 return castSegment.CastType == CastType
                     && castSegment.CastTypeName == CastTypeName;
             }

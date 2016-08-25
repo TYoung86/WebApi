@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("node");
             }
 
-            PropertyInfo pinfo = node.Member as PropertyInfo;
+            var pinfo = node.Member as PropertyInfo;
 
             if (pinfo == null)
             {
@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.InvalidOperation(SRResources.LambdaExpressionMustHaveExactlyOneParameter);
             }
 
-            Expression body = Visit(lambda.Body);
+            var body = Visit(lambda.Body);
 
             if (body != lambda.Body)
             {

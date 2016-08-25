@@ -104,7 +104,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Nested generics appropriate here")]
         public virtual void Ignore<TProperty>(Expression<Func<TStructuralType, TProperty>> propertyExpression)
         {
-            PropertyInfo ignoredProperty = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
+            var ignoredProperty = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
             _configuration.RemoveProperty(ignoredProperty);
         }
 
@@ -242,15 +242,15 @@ namespace Microsoft.AspNetCore.OData.Builder
             Justification = "More specific expression type is clearer")]
         public void HasDynamicProperties(Expression<Func<TStructuralType, IDictionary<string, object>>> propertyExpression)
         {
-            PropertyInfo propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
+            var propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
 
             _configuration.AddDynamicPropertyDictionary(propertyInfo);
         }
 
         private PrimitivePropertyConfiguration GetPrimitivePropertyConfiguration(Expression propertyExpression, bool optional)
         {
-            PropertyInfo propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
-            PrimitivePropertyConfiguration property = _configuration.AddProperty(propertyInfo);
+            var propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
+            var property = _configuration.AddProperty(propertyInfo);
             if (optional)
             {
                 property.IsOptional();
@@ -261,9 +261,9 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private EnumPropertyConfiguration GetEnumPropertyConfiguration(Expression propertyExpression, bool optional)
         {
-            PropertyInfo propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
+            var propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
 
-            EnumPropertyConfiguration property = _configuration.AddEnumProperty(propertyInfo);
+            var property = _configuration.AddEnumProperty(propertyInfo);
             if (optional)
             {
                 property.IsOptional();
@@ -274,8 +274,8 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private ComplexPropertyConfiguration GetComplexPropertyConfiguration(Expression propertyExpression, bool optional = false)
         {
-            PropertyInfo propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
-            ComplexPropertyConfiguration property = _configuration.AddComplexProperty(propertyInfo);
+            var propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
+            var property = _configuration.AddComplexProperty(propertyInfo);
             if (optional)
             {
                 property.IsOptional();
@@ -290,7 +290,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private CollectionPropertyConfiguration GetCollectionPropertyConfiguration(Expression propertyExpression, bool optional = false)
         {
-            PropertyInfo propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
+            var propertyInfo = PropertySelectorVisitor.GetSelectedProperty(propertyExpression);
             CollectionPropertyConfiguration property;
 
             property = _configuration.AddCollectionProperty(propertyInfo);

@@ -45,9 +45,9 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "Explicit Expression generic type is more clear")]
         public void ApplyLowerCamelCase(ODataConventionModelBuilder builder)
         {
-            foreach (StructuralTypeConfiguration typeConfiguration in builder.StructuralTypes)
+            foreach (var typeConfiguration in builder.StructuralTypes)
             {
-                foreach (PropertyConfiguration property in typeConfiguration.Properties)
+                foreach (var property in typeConfiguration.Properties)
                 {
                     if (ShouldApplyLowerCamelCase(property))
                     {
@@ -74,9 +74,9 @@ namespace Microsoft.AspNetCore.OData.Builder
                 return name;
             }
 
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
-            for (int index = 0; index < name.Length; index++)
+            for (var index = 0; index < name.Length; index++)
             {
                 if (index != 0 && index + 1 < name.Length && !Char.IsUpper(name[index + 1]))
                 {
@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             }
             else
             {
-                DataMemberAttribute attribute = property.PropertyInfo.GetCustomAttribute<DataMemberAttribute>(inherit: false);
+                var attribute = property.PropertyInfo.GetCustomAttribute<DataMemberAttribute>(inherit: false);
 
                 if (attribute != null && !String.IsNullOrWhiteSpace(attribute.Name))
                 {

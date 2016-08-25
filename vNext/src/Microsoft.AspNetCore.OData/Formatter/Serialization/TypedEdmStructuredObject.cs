@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             Contract.Assert(_type != null);
 
-            Func<object, object> getter = GetOrCreatePropertyGetter(_type, propertyName, _edmType, Model);
+            var getter = GetOrCreatePropertyGetter(_type, propertyName, _edmType, Model);
             if (getter == null)
             {
                 value = null;
@@ -83,12 +83,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmStructuredTypeReference edmType,
             IEdmModel model)
         {
-            Tuple<string, Type> key = Tuple.Create(propertyName, type);
+            var key = Tuple.Create(propertyName, type);
             Func<object, object> getter;
 
             if (!_propertyGetterCache.TryGetValue(key, out getter))
             {
-                IEdmProperty property = edmType.FindProperty(propertyName);
+                var property = edmType.FindProperty(propertyName);
                 if (property != null && model != null)
                 {
                     propertyName = EdmLibHelpers.GetClrPropertyName(property, model) ?? propertyName;
@@ -103,7 +103,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
         private static Func<object, object> CreatePropertyGetter(Type type, string propertyName)
         {
-            PropertyInfo property = type.GetProperty(propertyName);
+            var property = type.GetProperty(propertyName);
 
             if (property == null)
             {

@@ -166,7 +166,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // Now match the parameters
             foreach (var descriptor in methodDescriptor)
             {
-                bool matchFound = true;
+                var matchFound = true;
                 if (descriptor.Parameters.Count(d => d.BindingInfo == null) == keys.Count)
                 {
                     foreach (var key in keys)

@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
             }
             else
             {
-                IEnumerable<string> keyValues =
+                var keyValues =
                     keys.Select(key => String.Format(
                         CultureInfo.InvariantCulture, "{0}={1}", key.Name, GetUriRepresentationForKeyValue(key, entityContext)));
                 return String.Join(",", keyValues);
@@ -45,10 +45,10 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
         // Get properties of this entity type that are not already declared in the base entity type and are not already ignored.
         public static IEnumerable<PropertyInfo> GetProperties(EntityTypeConfiguration entity, bool includeReadOnly)
         {
-            IEnumerable<PropertyInfo> allProperties = GetAllProperties(entity as StructuralTypeConfiguration, includeReadOnly);
+            var allProperties = GetAllProperties(entity as StructuralTypeConfiguration, includeReadOnly);
             if (entity.BaseType != null)
             {
-                IEnumerable<PropertyInfo> baseTypeProperties = GetAllProperties(entity.BaseType as StructuralTypeConfiguration, includeReadOnly);
+                var baseTypeProperties = GetAllProperties(entity.BaseType as StructuralTypeConfiguration, includeReadOnly);
                 return allProperties.Except(baseTypeProperties, PropertyEqualityComparer.Instance);
             }
             else
@@ -88,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
             if (propertyInfo.CanRead)
             {
                 // non-public getters are not valid properties
-                MethodInfo publicGetter = propertyInfo.GetGetMethod();
+                var publicGetter = propertyInfo.GetGetMethod();
                 if (publicGetter != null && propertyInfo.PropertyType.IsValidStructuralPropertyType())
                 {
                     return true;
@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
                 return Enumerable.Empty<PropertyInfo>();
             }
 
-            EntityTypeConfiguration entityType = structuralType as EntityTypeConfiguration;
+            var entityType = structuralType as EntityTypeConfiguration;
             if (entityType != null)
             {
                 return entityType.IgnoredProperties.Concat(entityType.BaseType.IgnoredProperties());
@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
         {
             Contract.Assert(value != null);
 
-            Type type = value.GetType();
+            var type = value.GetType();
             if (type.GetTypeInfo().IsEnum)
             {
                 value = new ODataEnumValue(value.ToString(), TypeExtensions.EdmFullName(type));
@@ -155,10 +155,10 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
             Contract.Assert(key != null);
             Contract.Assert(entityInstanceContext != null);
 
-            object value = entityInstanceContext.GetPropertyValue(key.Name);
+            var value = entityInstanceContext.GetPropertyValue(key.Name);
             if (value == null)
             {
-                IEdmTypeReference edmType = entityInstanceContext.EdmObject.GetEdmType();
+                var edmType = entityInstanceContext.EdmObject.GetEdmType();
                 throw Error.InvalidOperation(SRResources.KeyValueCannotBeNull, key.Name, edmType.Definition);
             }
 

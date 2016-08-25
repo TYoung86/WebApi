@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 return false;
             }
 
-            Type collectionInterface
+            var collectionInterface
                 = type.GetInterfaces()
                     .Union(new[] { type })
                     .FirstOrDefault(

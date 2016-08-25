@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 throw Error.ArgumentNull("segments");
             }
 
-            foreach (ODataPathSegment segment in segments)
+            foreach (var segment in segments)
             {
                 _edmType = segment.GetEdmType(_edmType);
                 _navigationSource = segment.GetNavigationSource(_navigationSource);
@@ -83,8 +83,8 @@ namespace Microsoft.AspNetCore.OData.Routing
             {
                 if (_pathTemplate == null)
                 {
-                    StringBuilder templateBuilder = new StringBuilder("~");
-                    foreach (ODataPathSegment segment in Segments)
+                    var templateBuilder = new StringBuilder("~");
+                    foreach (var segment in Segments)
                     {
                         templateBuilder.Append("/");
                         templateBuilder.Append(segment.SegmentKind);
@@ -111,12 +111,12 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <inheritdoc />
         public override string ToString()
         {
-            StringBuilder pathBuilder = new StringBuilder();
+            var pathBuilder = new StringBuilder();
             Contract.Assert(_segments != null);
 
-            bool firstSegment = true;
+            var firstSegment = true;
 
-            foreach (ODataPathSegment segment in _segments)
+            foreach (var segment in _segments)
             {
                 if (segment == null)
                 {

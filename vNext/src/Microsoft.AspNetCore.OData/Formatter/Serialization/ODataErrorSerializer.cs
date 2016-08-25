@@ -34,15 +34,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull("messageWriter");
             }
 
-            ODataError oDataError = graph as ODataError;
+            var oDataError = graph as ODataError;
             if (oDataError == null)
             {
-                string message = Error.Format(SRResources.ErrorTypeMustBeODataErrorOrHttpError, graph.GetType().FullName);
+                var message = Error.Format(SRResources.ErrorTypeMustBeODataErrorOrHttpError, graph.GetType().FullName);
                 throw new SerializationException(message);
                 
             }
 
-            bool includeDebugInformation = oDataError.InnerError != null;
+            var includeDebugInformation = oDataError.InnerError != null;
             messageWriter.WriteError(oDataError, includeDebugInformation);
         }
     }

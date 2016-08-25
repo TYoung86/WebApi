@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         internal static bool IsCountRequest(HttpRequest request)
         {
-            ODataPath path = request.ODataProperties().Path;
+            var path = request.ODataProperties().Path;
             return path != null && path.Segments.LastOrDefault() is CountPathSegment;
         }
     }

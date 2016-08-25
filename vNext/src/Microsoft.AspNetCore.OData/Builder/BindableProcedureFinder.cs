@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private static IEnumerable<IEdmEntityType> GetTypeHierarchy(IEdmEntityType entityType)
         {
-            IEdmEntityType current = entityType;
+            var current = entityType;
             while (current != null)
             {
                 yield return current;

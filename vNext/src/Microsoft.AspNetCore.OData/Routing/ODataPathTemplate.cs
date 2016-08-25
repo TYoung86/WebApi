@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 return false;
             }
 
-            for (int index = 0; index < Segments.Count; index++)
+            for (var index = 0; index < Segments.Count; index++)
             {
                 if (!Segments[index].TryMatch(path.Segments[index], values))
                 {

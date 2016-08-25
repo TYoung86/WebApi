@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         public static IDictionary<PropertyInfo, PropertyInfo> GetSelectedProperty(Expression exp)
         {
-            PropertyPairSelectorVisitor visitor = new PropertyPairSelectorVisitor();
+            var visitor = new PropertyPairSelectorVisitor();
             visitor.Visit(exp);
             return visitor.Properties;
         }
@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
                 case ExpressionType.And: // &
                 case ExpressionType.AndAlso: // &&
-                    BinaryExpression node = (BinaryExpression)exp;
+                    var node = (BinaryExpression)exp;
                     Visit(node.Left);
                     return Visit(node.Right);
 
@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.InvalidOperation(SRResources.LambdaExpressionMustHaveExactlyTwoParameters);
             }
 
-            Expression body = Visit(lambda.Body);
+            var body = Visit(lambda.Body);
 
             if (body != lambda.Body)
             {
@@ -79,15 +79,15 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             Contract.Assert(exp != null && exp.NodeType == ExpressionType.Equal);
 
-            BinaryExpression node = (BinaryExpression)exp;
+            var node = (BinaryExpression)exp;
 
-            PropertyInfo left = VisitMemberProperty(node.Left);
-            PropertyInfo right = VisitMemberProperty(node.Right);
+            var left = VisitMemberProperty(node.Left);
+            var right = VisitMemberProperty(node.Right);
 
             if (left != null && right != null)
             {
-                Type leftType = Nullable.GetUnderlyingType(left.PropertyType) ?? left.PropertyType;
-                Type rightType = Nullable.GetUnderlyingType(right.PropertyType) ?? right.PropertyType;
+                var leftType = Nullable.GetUnderlyingType(left.PropertyType) ?? left.PropertyType;
+                var rightType = Nullable.GetUnderlyingType(right.PropertyType) ?? right.PropertyType;
                 if (leftType != rightType)
                 {
                     throw Error.InvalidOperation(SRResources.EqualExpressionsMustHaveSameTypes,
@@ -121,7 +121,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             Contract.Assert(memberNode != null);
 
-            PropertyInfo propertyInfo = memberNode.Member as PropertyInfo;
+            var propertyInfo = memberNode.Member as PropertyInfo;
             if (propertyInfo == null)
             {
                 throw Error.InvalidOperation(SRResources.MemberExpressionsMustBeProperties,

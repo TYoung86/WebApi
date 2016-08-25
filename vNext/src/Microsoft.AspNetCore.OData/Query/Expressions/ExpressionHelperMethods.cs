@@ -159,7 +159,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private static MethodInfo GenericMethodOf(Expression expression)
         {
-            LambdaExpression lambdaExpression = expression as LambdaExpression;
+            var lambdaExpression = expression as LambdaExpression;
 
             Contract.Assert(expression.NodeType == ExpressionType.Lambda);
             Contract.Assert(lambdaExpression != null);

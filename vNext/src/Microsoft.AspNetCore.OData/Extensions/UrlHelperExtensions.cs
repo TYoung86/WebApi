@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             Contract.Assert(request != null);
 
-            string routeName = request.ODataProperties().Path.PathTemplate;
+            var routeName = request.ODataProperties().Path.PathTemplate;
             if (String.IsNullOrEmpty(routeName))
             {
                 throw Error.InvalidOperation(SRResources.RequestMustHaveODataRouteName);

@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.EntitySet)
             {
-                EntitySetPathSegment entitySetSegment = (EntitySetPathSegment)pathSegment;
+                var entitySetSegment = (EntitySetPathSegment)pathSegment;
                 return entitySetSegment.EntitySetBase == EntitySetBase && entitySetSegment.EntitySetName == EntitySetName;
             }
 

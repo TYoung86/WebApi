@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
 
         public void Apply(IEdmTypeConfiguration edmTypeConfiguration, ODataConventionModelBuilder model)
         {
-            EntityTypeConfiguration entity = edmTypeConfiguration as EntityTypeConfiguration;
+            var entity = edmTypeConfiguration as EntityTypeConfiguration;
             if (entity != null)
             {
                 Apply(entity, model);

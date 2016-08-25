@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (Function != null)
             {
-                IEdmTypeReference returnType = Function.Function.ReturnType;
+                var returnType = Function.Function.ReturnType;
                 if (returnType != null)
                 {
                     return returnType.Definition;
@@ -136,13 +136,13 @@ namespace Microsoft.AspNetCore.OData.Routing
             string paramValue;
             if (Values.TryGetValue(parameterName, out paramValue))
             {
-                IEdmOperationParameter edmParam = Function.Function.FindParameter(parameterName);
+                var edmParam = Function.Function.FindParameter(parameterName);
                 if (edmParam != null)
                 {
-                    IEdmTypeReference edmType = edmParam.Type;
+                    var edmType = edmParam.Type;
                     if (edmParam.Type.IsCollection())
                     {
-                        IEdmCollectionTypeReference collectionTypeReference = edmParam.Type.AsCollection();
+                        var collectionTypeReference = edmParam.Type.AsCollection();
                         edmType = collectionTypeReference.ElementType();
                     }
 
@@ -165,7 +165,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <returns> a <see cref="String" /> to represent this instance. </returns>
         public override string ToString()
         {
-            IEnumerable<string> parameters = Values.Select(v => String.Format(CultureInfo.InvariantCulture, "{0}={1}", v.Key, v.Value));
+            var parameters = Values.Select(v => String.Format(CultureInfo.InvariantCulture, "{0}={1}", v.Key, v.Value));
             return String.Format(CultureInfo.InvariantCulture, "{0}({1})", FunctionName, String.Join(",", parameters));
         }
 
@@ -174,7 +174,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.UnboundFunction)
             {
-                UnboundFunctionPathSegment functionSegment = (UnboundFunctionPathSegment)pathSegment;
+                var functionSegment = (UnboundFunctionPathSegment)pathSegment;
                 return functionSegment.Function == Function && functionSegment.FunctionName == FunctionName;
             }
 

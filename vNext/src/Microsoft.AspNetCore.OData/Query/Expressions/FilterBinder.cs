@@ -114,11 +114,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull("assembliesResolver");
             }
 
-            FilterBinder binder = new FilterBinder(model, assemblyProvider, querySettings);
-            LambdaExpression filter = binder.BindExpression(filterClause.Expression, filterClause.RangeVariable, filterType);
+            var binder = new FilterBinder(model, assemblyProvider, querySettings);
+            var filter = binder.BindExpression(filterClause.Expression, filterClause.RangeVariable, filterType);
             filter = Expression.Lambda(binder.ApplyNullPropagationForFilterBody(filter.Body), filter.Parameters);
 
-            Type expectedFilterType = typeof(Func<,>).MakeGenericType(filterType, typeof(bool));
+            var expectedFilterType = typeof(Func<,>).MakeGenericType(filterType, typeof(bool));
             if (filter.Type != expectedFilterType)
             {
                 throw Error.Argument("filterType", SRResources.CannotCastFilter, filter.Type.FullName, expectedFilterType.FullName);
@@ -135,8 +135,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(model != null);
             Contract.Assert(querySettings != null);
 
-            FilterBinder binder = new FilterBinder(model, querySettings);
-            LambdaExpression orderByLambda = binder.BindExpression(orderBy.Expression, orderBy.RangeVariable, elementType);
+            var binder = new FilterBinder(model, querySettings);
+            var orderByLambda = binder.BindExpression(orderBy.Expression, orderBy.RangeVariable, elementType);
             return orderByLambda;
         }
 
@@ -145,15 +145,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
 
-            CollectionNode collectionNode = node as CollectionNode;
-            SingleValueNode singleValueNode = node as SingleValueNode;
+            var collectionNode = node as CollectionNode;
+            var singleValueNode = node as SingleValueNode;
 
             if (collectionNode != null)
             {
                 switch (node.Kind)
                 {
                     case QueryNodeKind.CollectionNavigationNode:
-                        CollectionNavigationNode navigationNode = node as CollectionNavigationNode;
+                        var navigationNode = node as CollectionNavigationNode;
                         return BindNavigationPropertyNode(navigationNode.Source, navigationNode.NavigationProperty);
 
                     case QueryNodeKind.CollectionPropertyAccess:
@@ -203,7 +203,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         return BindSingleValueFunctionCallNode(node as SingleValueFunctionCallNode);
 
                     case QueryNodeKind.SingleNavigationNode:
-                        SingleNavigationNode navigationNode = node as SingleNavigationNode;
+                        var navigationNode = node as SingleNavigationNode;
                         return BindNavigationPropertyNode(navigationNode.Source, navigationNode.NavigationProperty);
 
                     case QueryNodeKind.Any:
@@ -302,11 +302,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert(ClrCanonicalFunctions.CastFunctionName == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
 
             Contract.Assert(arguments.Length == 2);
 
-            string targetEdmTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
+            var targetEdmTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
             IEdmType targetEdmType = _model.FindType(targetEdmTypeName);
             Type targetClrType = null;
 
@@ -329,23 +329,23 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression BindSingleEntityCastNode(SingleEntityCastNode node)
         {
-            IEdmEntityTypeReference entity = node.EntityTypeReference;
+            var entity = node.EntityTypeReference;
             Contract.Assert(entity != null, "NS casts can contain only entity types");
 
-            Type clrType = EdmLibHelpers.GetClrType(entity, _model);
+            var clrType = EdmLibHelpers.GetClrType(entity, _model);
 
-            Expression source = BindCastSourceNode(node.Source);
+            var source = BindCastSourceNode(node.Source);
             return Expression.TypeAs(source, clrType);
         }
 
         private Expression BindEntityCollectionCastNode(EntityCollectionCastNode node)
         {
-            IEdmEntityTypeReference entity = node.EntityItemType;
+            var entity = node.EntityItemType;
             Contract.Assert(entity != null, "NS casts can contain only entity types");
 
-            Type clrType = EdmLibHelpers.GetClrType(entity, _model);
+            var clrType = EdmLibHelpers.GetClrType(entity, _model);
 
-            Expression source = BindCastSourceNode(node.Source);
+            var source = BindCastSourceNode(node.Source);
             return OfType(source, clrType);
         }
 
@@ -400,11 +400,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression BindBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode)
         {
-            Expression left = Bind(binaryOperatorNode.Left);
-            Expression right = Bind(binaryOperatorNode.Right);
+            var left = Bind(binaryOperatorNode.Left);
+            var right = Bind(binaryOperatorNode.Right);
 
             // handle null propagation only if either of the operands can be null
-            bool isNullPropagationRequired = _querySettings.HandleNullPropagation == HandleNullPropagationOption.True && (IsNullable(left.Type) || IsNullable(right.Type));
+            var isNullPropagationRequired = _querySettings.HandleNullPropagation == HandleNullPropagationOption.True && (IsNullable(left.Type) || IsNullable(right.Type));
             if (isNullPropagationRequired)
             {
                 // |----------------------------------------------------------------|
@@ -427,7 +427,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 left = ToNullable(left);
                 right = ToNullable(right);
 
-                bool liftToNull = true;
+                var liftToNull = true;
                 if (left == _nullConstant || right == _nullConstant)
                 {
                     liftToNull = false;
@@ -452,13 +452,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return _nullConstant;
             }
 
-            Type constantType = EdmLibHelpers.GetClrType(constantNode.TypeReference, _model, _assemblyProvider);
-            object value = constantNode.Value;
+            var constantType = EdmLibHelpers.GetClrType(constantNode.TypeReference, _model, _assemblyProvider);
+            var value = constantNode.Value;
 
             if (constantNode.TypeReference != null && constantNode.TypeReference.IsEnum())
             {
-                ODataEnumValue odataEnumValue = (ODataEnumValue)value;
-                string strValue = odataEnumValue.Value;
+                var odataEnumValue = (ODataEnumValue)value;
+                var strValue = odataEnumValue.Value;
                 Contract.Assert(strValue != null);
 
                 constantType = Nullable.GetUnderlyingType(constantType) ?? constantType;
@@ -480,9 +480,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(convertNode != null);
             Contract.Assert(convertNode.TypeReference != null);
 
-            Expression source = Bind(convertNode.Source);
+            var source = Bind(convertNode.Source);
 
-            Type conversionType = EdmLibHelpers.GetClrType(convertNode.TypeReference, _model, _assemblyProvider);
+            var conversionType = EdmLibHelpers.GetClrType(convertNode.TypeReference, _model, _assemblyProvider);
 
             if (conversionType == typeof(bool?) && source.Type == typeof(bool))
             {
@@ -533,11 +533,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private LambdaExpression BindExpression(SingleValueNode expression, RangeVariable rangeVariable, Type elementType)
         {
-            ParameterExpression filterParameter = Expression.Parameter(elementType, rangeVariable.Name);
+            var filterParameter = Expression.Parameter(elementType, rangeVariable.Name);
             _lambdaParameters = new Dictionary<string, ParameterExpression>();
             _lambdaParameters.Add(rangeVariable.Name, filterParameter);
 
-            Expression body = Bind(expression);
+            var body = Bind(expression);
             return Expression.Lambda(body, filterParameter);
         }
 
@@ -562,25 +562,25 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression BindRangeVariable(RangeVariable rangeVariable)
         {
-            ParameterExpression parameter = _lambdaParameters[rangeVariable.Name];
+            var parameter = _lambdaParameters[rangeVariable.Name];
             return ConvertNonStandardPrimitives(parameter);
         }
 
         private Expression BindCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode)
         {
-            Expression source = Bind(propertyAccessNode.Source);
+            var source = Bind(propertyAccessNode.Source);
             return CreatePropertyAccessExpression(source, propertyAccessNode.Property);
         }
 
         private Expression BindPropertyAccessQueryNode(SingleValuePropertyAccessNode propertyAccessNode)
         {
-            Expression source = Bind(propertyAccessNode.Source);
+            var source = Bind(propertyAccessNode.Source);
             return CreatePropertyAccessExpression(source, propertyAccessNode.Property);
         }
 
         private Expression CreatePropertyAccessExpression(Expression source, IEdmProperty property)
         {
-            string propertyName = EdmLibHelpers.GetClrPropertyName(property, _model);
+            var propertyName = EdmLibHelpers.GetClrPropertyName(property, _model);
             if (_querySettings.HandleNullPropagation == HandleNullPropagationOption.True && IsNullable(source.Type) && source != _lambdaParameters[ODataItParameterName])
             {
                 Expression propertyAccessExpression = Expression.Property(RemoveInnerNullPropagation(source), propertyName);
@@ -588,7 +588,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 // source.property => source == null ? null : [CastToNullable]RemoveInnerNullPropagation(source).property
                 // Notice that we are checking if source is null already. so we can safely remove any null checks when doing source.Property
 
-                Expression ifFalse = ToNullable(ConvertNonStandardPrimitives(propertyAccessExpression));
+                var ifFalse = ToNullable(ConvertNonStandardPrimitives(propertyAccessExpression));
                 return
                     Expression.Condition(
                         test: Expression.Equal(source, _nullConstant),
@@ -606,7 +606,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // No need to handle null-propagation here as CLR already handles it.
             // !(null) = null
             // -(null) = null
-            Expression inner = Bind(unaryOperatorNode.Operand);
+            var inner = Bind(unaryOperatorNode.Operand);
             switch (unaryOperatorNode.OperatorKind)
             {
                 case UnaryOperatorKind.Negate:
@@ -694,7 +694,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             if (_querySettings.HandleNullPropagation == HandleNullPropagationOption.True)
             {
-                Expression test = CheckIfArgumentsAreNull(arguments);
+                var test = CheckIfArgumentsAreNull(arguments);
 
                 if (test == _falseConstant)
                 {
@@ -733,7 +733,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 if (expression.NodeType == ExpressionType.Conditional)
                 {
                     // make sure to skip the DateTime IFF clause
-                    ConditionalExpression conditionalExpr = (ConditionalExpression)expression;
+                    var conditionalExpr = (ConditionalExpression)expression;
                     if (conditionalExpr.Test.NodeType != ExpressionType.OrElse)
                     {
                         expression = conditionalExpr.IfFalse;
@@ -741,7 +741,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                         if (expression.NodeType == ExpressionType.Convert)
                         {
-                            UnaryExpression unaryExpression = expression as UnaryExpression;
+                            var unaryExpression = expression as UnaryExpression;
                             Contract.Assert(unaryExpression != null);
 
                             if (Nullable.GetUnderlyingType(unaryExpression.Type) == unaryExpression.Operand.Type)
@@ -777,7 +777,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Expression functionCall;
             if (member is MethodInfo)
             {
-                MethodInfo method = member as MethodInfo;
+                var method = member as MethodInfo;
                 if (method.IsStatic)
                 {
                     functionCall = Expression.Call(null, method, functionCallArguments);
@@ -798,7 +798,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression MakePropertyAccess(PropertyInfo propertyInfo, Expression argument)
         {
-            Expression propertyArgument = argument;
+            var propertyArgument = argument;
             if (_querySettings.HandleNullPropagation == HandleNullPropagationOption.True)
             {
                 // we don't have to check if the argument is null inside the function call as we do it already
@@ -817,17 +817,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert(ClrCanonicalFunctions.CastFunctionName == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             Contract.Assert(arguments.Length == 1 || arguments.Length == 2);
 
-            Expression source = arguments.Length == 1 ? _lambdaParameters[ODataItParameterName] : arguments[0];
-            string targetTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
+            var source = arguments.Length == 1 ? _lambdaParameters[ODataItParameterName] : arguments[0];
+            var targetTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
             IEdmType targetEdmType = _model.FindType(targetTypeName);
             Type targetClrType = null;
 
             if (targetEdmType != null)
             {
-                IEdmTypeReference targetEdmTypeReference = targetEdmType.ToEdmTypeReference(false);
+                var targetEdmTypeReference = targetEdmType.ToEdmTypeReference(false);
                 targetClrType = EdmLibHelpers.GetClrType(targetEdmTypeReference, _model);
 
                 if (source != _nullConstant)
@@ -920,8 +920,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression BindCastToEnumType(Type sourceType, Type targetClrType, QueryNode firstParameter, int parameterLength)
         {
-            Type enumType = TypeHelper.GetUnderlyingTypeOrSelf(targetClrType);
-            ConstantNode sourceNode = firstParameter as ConstantNode;
+            var enumType = TypeHelper.GetUnderlyingTypeOrSelf(targetClrType);
+            var sourceNode = firstParameter as ConstantNode;
 
             if (parameterLength == 1 || sourceNode == null || sourceType != typeof(string))
             {
@@ -931,8 +931,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
-                object[] parameters = new[] { sourceNode.Value, Enum.ToObject(enumType, 0) };
-                bool isSuccessful = (bool)_enumTryParseMethod.MakeGenericMethod(enumType).Invoke(null, parameters);
+                var parameters = new[] { sourceNode.Value, Enum.ToObject(enumType, 0) };
+                var isSuccessful = (bool)_enumTryParseMethod.MakeGenericMethod(enumType).Invoke(null, parameters);
 
                 if (isSuccessful)
                 {
@@ -956,11 +956,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("ceiling" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
 
             Contract.Assert(arguments.Length == 1 && IsDoubleOrDecimal(arguments[0].Type));
 
-            MethodInfo ceiling = IsType<double>(arguments[0].Type)
+            var ceiling = IsType<double>(arguments[0].Type)
                 ? ClrCanonicalFunctions.CeilingOfDouble
                 : ClrCanonicalFunctions.CeilingOfDecimal;
             return MakeFunctionCall(ceiling, arguments);
@@ -970,11 +970,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("floor" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
 
             Contract.Assert(arguments.Length == 1 && IsDoubleOrDecimal(arguments[0].Type));
 
-            MethodInfo floor = IsType<double>(arguments[0].Type)
+            var floor = IsType<double>(arguments[0].Type)
                 ? ClrCanonicalFunctions.FloorOfDouble
                 : ClrCanonicalFunctions.FloorOfDecimal;
             return MakeFunctionCall(floor, arguments);
@@ -984,11 +984,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("round" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
 
             Contract.Assert(arguments.Length == 1 && IsDoubleOrDecimal(arguments[0].Type));
 
-            MethodInfo round = IsType<double>(arguments[0].Type)
+            var round = IsType<double>(arguments[0].Type)
                 ? ClrCanonicalFunctions.RoundOfDouble
                 : ClrCanonicalFunctions.RoundOfDecimal;
             return MakeFunctionCall(round, arguments);
@@ -998,7 +998,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("date" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
             Contract.Assert(arguments.Length == 1 && IsDateOrOffset(arguments[0].Type));
@@ -1012,7 +1012,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("time" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
             Contract.Assert(arguments.Length == 1 && IsDateOrOffset(arguments[0].Type));
@@ -1026,11 +1026,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("fractionalseconds" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             Contract.Assert(arguments.Length == 1 && (IsTimeRelated(arguments[0].Type)));
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
-            Expression parameter = arguments[0];
+            var parameter = arguments[0];
 
             PropertyInfo property;
             if (IsTimeOfDay(parameter.Type))
@@ -1048,7 +1048,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             // Millisecond
-            Expression milliSecond = MakePropertyAccess(property, parameter);
+            var milliSecond = MakePropertyAccess(property, parameter);
             Expression decimalMilliSecond = Expression.Convert(milliSecond, typeof(decimal));
             Expression fractionalSeconds = Expression.Divide(decimalMilliSecond, Expression.Constant(1000m, typeof(decimal)));
 
@@ -1057,11 +1057,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression BindDateRelatedProperty(SingleValueFunctionCallNode node)
         {
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             Contract.Assert(arguments.Length == 1 && IsDateRelated(arguments[0].Type));
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
-            Expression parameter = arguments[0];
+            var parameter = arguments[0];
 
             PropertyInfo property;
             if (IsDate(parameter.Type))
@@ -1085,11 +1085,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression BindTimeRelatedProperty(SingleValueFunctionCallNode node)
         {
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             Contract.Assert(arguments.Length == 1 && (IsTimeRelated(arguments[0].Type)));
 
             // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
-            Expression parameter = arguments[0];
+            var parameter = arguments[0];
 
             PropertyInfo property;
             if (IsTimeOfDay(parameter.Type))
@@ -1115,7 +1115,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("concat" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
@@ -1127,7 +1127,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("trim" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 1 && arguments[0].Type == typeof(string));
@@ -1139,7 +1139,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("toupper" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 1 && arguments[0].Type == typeof(string));
@@ -1151,7 +1151,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("tolower" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 1 && arguments[0].Type == typeof(string));
@@ -1163,7 +1163,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("indexof" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
@@ -1175,7 +1175,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("substring" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             if (arguments[0].Type != typeof(string))
             {
                 throw new ODataException(Error.Format(SRResources.FunctionNotSupportedOnEnum, node.Name));
@@ -1225,7 +1225,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("length" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 1 && arguments[0].Type == typeof(string));
@@ -1237,7 +1237,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("contains" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
@@ -1249,7 +1249,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("startswith" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
@@ -1261,7 +1261,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Contract.Assert("endswith" == node.Name);
 
-            Expression[] arguments = BindArguments(node.Parameters);
+            var arguments = BindArguments(node.Parameters);
             ValidateAllStringArguments(node.Name, arguments);
 
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
@@ -1274,7 +1274,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(TypeHelper.IsEnum(left.Type));
             Contract.Assert(flag.Type == typeof(Enum));
 
-            Expression[] arguments = new[] { left, flag };
+            var arguments = new[] { left, flag };
             return MakeFunctionCall(ClrCanonicalFunctions.HasFlag, arguments);
         }
 
@@ -1293,20 +1293,20 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression BindAllNode(AllNode allNode)
         {
-            ParameterExpression allIt = HandleLambdaParameters(allNode.RangeVariables);
+            var allIt = HandleLambdaParameters(allNode.RangeVariables);
 
             Expression source;
             Contract.Assert(allNode.Source != null);
             source = Bind(allNode.Source);
 
-            Expression body = source;
+            var body = source;
             Contract.Assert(allNode.Body != null);
 
             body = Bind(allNode.Body);
             body = ApplyNullPropagationForFilterBody(body);
             body = Expression.Lambda(body, allIt);
 
-            Expression all = All(source, body);
+            var all = All(source, body);
 
             ExitLamdbaScope();
 
@@ -1327,7 +1327,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression BindAnyNode(AnyNode anyNode)
         {
-            ParameterExpression anyIt = HandleLambdaParameters(anyNode.RangeVariables);
+            var anyIt = HandleLambdaParameters(anyNode.RangeVariables);
 
             Expression source;
             Contract.Assert(anyNode.Source != null);
@@ -1342,7 +1342,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 body = Expression.Lambda(body, anyIt);
             }
 
-            Expression any = Any(source, body);
+            var any = Any(source, body);
 
             ExitLamdbaScope();
 
@@ -1367,8 +1367,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             EnterLambdaScope();
 
-            Dictionary<string, ParameterExpression> newParameters = new Dictionary<string, ParameterExpression>();
-            foreach (RangeVariable rangeVariable in rangeVariables)
+            var newParameters = new Dictionary<string, ParameterExpression>();
+            foreach (var rangeVariable in rangeVariables)
             {
                 ParameterExpression parameter;
                 if (!_lambdaParameters.TryGetValue(rangeVariable.Name, out parameter))
@@ -1376,11 +1376,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     // Work-around issue 481323 where UriParser yields a collection parameter type
                     // for primitive collections rather than the inner element type of the collection.
                     // Remove this block of code when 481323 is resolved.
-                    IEdmTypeReference edmTypeReference = rangeVariable.TypeReference;
-                    IEdmCollectionTypeReference collectionTypeReference = edmTypeReference as IEdmCollectionTypeReference;
+                    var edmTypeReference = rangeVariable.TypeReference;
+                    var collectionTypeReference = edmTypeReference as IEdmCollectionTypeReference;
                     if (collectionTypeReference != null)
                     {
-                        IEdmCollectionType collectionType = collectionTypeReference.Definition as IEdmCollectionType;
+                        var collectionType = collectionTypeReference.Definition as IEdmCollectionType;
                         if (collectionType != null)
                         {
                             edmTypeReference = collectionType.ElementType;
@@ -1404,11 +1404,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         private Expression ConvertNonStandardPrimitives(Expression source)
         {
             bool isNonstandardEdmPrimitive;
-            Type conversionType = EdmLibHelpers.IsNonstandardEdmPrimitive(source.Type, out isNonstandardEdmPrimitive);
+            var conversionType = EdmLibHelpers.IsNonstandardEdmPrimitive(source.Type, out isNonstandardEdmPrimitive);
 
             if (isNonstandardEdmPrimitive)
             {
-                Type sourceType = TypeHelper.GetUnderlyingTypeOrSelf(source.Type);
+                var sourceType = TypeHelper.GetUnderlyingTypeOrSelf(source.Type);
 
                 Contract.Assert(sourceType != conversionType);
 
@@ -1501,14 +1501,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             // When comparing an enum to a string, parse the string, convert both to the enum underlying type, and compare the values
             // When comparing an enum to an enum with the same type, convert both to the underlying type, and compare the values
-            Type leftUnderlyingType = Nullable.GetUnderlyingType(left.Type) ?? left.Type;
-            Type rightUnderlyingType = Nullable.GetUnderlyingType(right.Type) ?? right.Type;
+            var leftUnderlyingType = Nullable.GetUnderlyingType(left.Type) ?? left.Type;
+            var rightUnderlyingType = Nullable.GetUnderlyingType(right.Type) ?? right.Type;
 
             // Convert to integers unless Enum type is required
             if ((leftUnderlyingType.GetTypeInfo().IsEnum || rightUnderlyingType.GetTypeInfo().IsEnum) && binaryOperator != BinaryOperatorKind.Has)
             {
-                Type enumType = leftUnderlyingType.GetTypeInfo().IsEnum ? leftUnderlyingType : rightUnderlyingType;
-                Type enumUnderlyingType = Enum.GetUnderlyingType(enumType);
+                var enumType = leftUnderlyingType.GetTypeInfo().IsEnum ? leftUnderlyingType : rightUnderlyingType;
+                var enumUnderlyingType = Enum.GetUnderlyingType(enumType);
                 left = ConvertToEnumUnderlyingType(left, enumType, enumUnderlyingType);
                 right = ConvertToEnumUnderlyingType(right, enumType, enumUnderlyingType);
             }
@@ -1578,7 +1578,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         case ExpressionType.NotEqual:
                             return Expression.MakeBinary(binaryExpressionType, left, right, liftToNull, method: Linq2ObjectsComparisonMethods.AreByteArraysNotEqualMethodInfo);
                         default:
-                            IEdmPrimitiveType binaryType = EdmLibHelpers.GetEdmPrimitiveTypeOrNull(typeof(byte[]));
+                            var binaryType = EdmLibHelpers.GetEdmPrimitiveTypeOrNull(typeof(byte[]));
                             throw new ODataException(Error.Format(SRResources.BinaryOperatorNotSupported, binaryType.FullName(), binaryType.FullName(), binaryOperator));
                     }
                 }
@@ -1593,7 +1593,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 // {(c1, c2) => c1.HasFlag(Convert(c2))}
                 if (TypeHelper.IsEnum(left.Type) && TypeHelper.IsEnum(right.Type) && binaryOperator == BinaryOperatorKind.Has)
                 {
-                    UnaryExpression flag = Expression.Convert(right, typeof(Enum));
+                    var flag = Expression.Convert(right, typeof(Enum));
                     return BindHas(left, flag);
                 }
                 else
@@ -1651,9 +1651,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         private Expression CreateDateBinaryExpression(Expression source)
         {
             // Year, Month, Day
-            Expression year = GetProperty(source, ClrCanonicalFunctions.YearFunctionName);
-            Expression month = GetProperty(source, ClrCanonicalFunctions.MonthFunctionName);
-            Expression day = GetProperty(source, ClrCanonicalFunctions.DayFunctionName);
+            var year = GetProperty(source, ClrCanonicalFunctions.YearFunctionName);
+            var month = GetProperty(source, ClrCanonicalFunctions.MonthFunctionName);
+            var day = GetProperty(source, ClrCanonicalFunctions.DayFunctionName);
 
             // return (year * 10000 + month * 100 + day)
             Expression result =
@@ -1667,10 +1667,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         private Expression CreateTimeBinaryExpression(Expression source)
         {
             // Hour, Minute, Second, Millisecond
-            Expression hour = GetProperty(source, ClrCanonicalFunctions.HourFunctionName);
-            Expression minute = GetProperty(source, ClrCanonicalFunctions.MinuteFunctionName);
-            Expression second = GetProperty(source, ClrCanonicalFunctions.SecondFunctionName);
-            Expression milliSecond = GetProperty(source, ClrCanonicalFunctions.MillisecondFunctionName);
+            var hour = GetProperty(source, ClrCanonicalFunctions.HourFunctionName);
+            var minute = GetProperty(source, ClrCanonicalFunctions.MinuteFunctionName);
+            var second = GetProperty(source, ClrCanonicalFunctions.SecondFunctionName);
+            var milliSecond = GetProperty(source, ClrCanonicalFunctions.MillisecondFunctionName);
 
             Expression hourTicks = Expression.Multiply(Expression.Convert(hour, typeof(long)), Expression.Constant(TimeOfDay.TicksPerHour));
             Expression minuteTicks = Expression.Multiply(Expression.Convert(minute, typeof(long)), Expression.Constant(TimeOfDay.TicksPerMinute));
@@ -1684,10 +1684,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private static Expression ConvertToEnumUnderlyingType(Expression expression, Type enumType, Type enumUnderlyingType)
         {
-            object parameterizedConstantValue = ExtractParameterizedConstant(expression);
+            var parameterizedConstantValue = ExtractParameterizedConstant(expression);
             if (parameterizedConstantValue != null)
             {
-                string enumStringValue = parameterizedConstantValue as string;
+                var enumStringValue = parameterizedConstantValue as string;
                 if (enumStringValue != null)
                 {
                     return Expression.Constant(
@@ -1726,14 +1726,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             if (expression.NodeType == ExpressionType.MemberAccess)
             {
-                MemberExpression memberAccess = expression as MemberExpression;
+                var memberAccess = expression as MemberExpression;
                 Contract.Assert(memberAccess != null);
                 if (memberAccess.Expression.NodeType == ExpressionType.Constant)
                 {
-                    ConstantExpression constant = memberAccess.Expression as ConstantExpression;
+                    var constant = memberAccess.Expression as ConstantExpression;
                     Contract.Assert(constant != null);
                     Contract.Assert(constant.Value != null);
-                    LinqParameterContainer value = constant.Value as LinqParameterContainer;
+                    var value = constant.Value as LinqParameterContainer;
                     Contract.Assert(value != null, "Constants are already embedded into LinqParameterContainer");
 
                     return value.Property;
@@ -1923,7 +1923,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private static Expression ConvertNull(Expression expression, Type type)
         {
-            ConstantExpression constantExpression = expression as ConstantExpression;
+            var constantExpression = expression as ConstantExpression;
             if (constantExpression != null && constantExpression.Value == null)
             {
                 return Expression.Constant(null, type);

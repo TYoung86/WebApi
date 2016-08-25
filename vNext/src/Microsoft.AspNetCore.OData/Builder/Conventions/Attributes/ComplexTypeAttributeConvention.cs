@@ -25,14 +25,14 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
 
             if (!edmTypeConfiguration.AddedExplicitly)
             {
-                PrimitivePropertyConfiguration[] keys = edmTypeConfiguration.Keys.ToArray();
-                foreach (PrimitivePropertyConfiguration key in keys)
+                var keys = edmTypeConfiguration.Keys.ToArray();
+                foreach (var key in keys)
                 {
                     edmTypeConfiguration.RemoveKey(key);
                 }
 
-                EnumPropertyConfiguration[] enumKeys = edmTypeConfiguration.EnumKeys.ToArray();
-                foreach (EnumPropertyConfiguration key in enumKeys)
+                var enumKeys = edmTypeConfiguration.EnumKeys.ToArray();
+                foreach (var key in enumKeys)
                 {
                     edmTypeConfiguration.RemoveKey(key);
                 }

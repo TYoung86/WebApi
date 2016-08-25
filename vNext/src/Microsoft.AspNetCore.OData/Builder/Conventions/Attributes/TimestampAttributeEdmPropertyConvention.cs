@@ -21,10 +21,10 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
             Attribute attribute,
             ODataConventionModelBuilder model)
         {
-            EntityTypeConfiguration entity = structuralTypeConfiguration as EntityTypeConfiguration;
+            var entity = structuralTypeConfiguration as EntityTypeConfiguration;
             if (entity != null)
             {
-                PrimitivePropertyConfiguration[] timestampProperties = GetPropertiesWithTimestamp(entity);
+                var timestampProperties = GetPropertiesWithTimestamp(entity);
 
                 // We only support one Timestamp column per type, as a SQL table (the underlying concept this attribute
                 // is bounded to) only supports one row version column per table.
@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
 
         private static PrimitivePropertyConfiguration[] GetPropertiesWithTimestamp(EntityTypeConfiguration config)
         {
-            IEnumerable<PropertyConfiguration> properties = config.ThisAndBaseTypes().SelectMany(p => p.Properties);
+            var properties = config.ThisAndBaseTypes().SelectMany(p => p.Properties);
             return properties.OfType<PrimitivePropertyConfiguration>()
                 .Where(pc => pc.PropertyInfo.GetCustomAttributes(typeof(TimestampAttribute), inherit: true).Any())
                 .ToArray();

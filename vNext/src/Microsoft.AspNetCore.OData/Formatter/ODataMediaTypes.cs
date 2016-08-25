@@ -123,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             Contract.Assert(contentType.Parameters != null);
-            NameValueHeaderValue odataParameter =
+            var odataParameter =
                 contentType.Parameters.FirstOrDefault(
                     (p) => String.Equals("odata.metadata", p.Name, StringComparison.OrdinalIgnoreCase));
 

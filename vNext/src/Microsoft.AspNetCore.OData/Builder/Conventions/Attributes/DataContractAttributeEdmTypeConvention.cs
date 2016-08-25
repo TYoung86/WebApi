@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                 model.ModelAliasingEnabled)
             {
                 // set the name, and namespace, if not null
-                DataContractAttribute dataContractAttribute = attribute as DataContractAttribute;
+                var dataContractAttribute = attribute as DataContractAttribute;
                 if (dataContractAttribute != null)
                 {
                     if (dataContractAttribute.Name != null)
@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
             }
 
             IEnumerable<PropertyConfiguration> allProperties = edmTypeConfiguration.Properties.ToArray();
-            foreach (PropertyConfiguration property in allProperties)
+            foreach (var property in allProperties)
             {
                 if (!property.PropertyInfo.GetCustomAttributes(typeof(DataMemberAttribute), inherit: true).Any())
                 {

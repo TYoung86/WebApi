@@ -98,7 +98,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "typeof(TBaseType) is used and getting it as a generic argument is cleaner")]
         public EntityTypeConfiguration<TEntityType> DerivesFrom<TBaseType>() where TBaseType : class
         {
-            EntityTypeConfiguration<TBaseType> baseEntityType = _modelBuilder.EntityType<TBaseType>();
+            var baseEntityType = _modelBuilder.EntityType<TBaseType>();
             _configuration.DerivesFrom(baseEntityType._configuration);
             return this;
         }
@@ -113,8 +113,8 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "Explicit Expression generic type is more clear")]
         public EntityTypeConfiguration<TEntityType> HasKey<TKey>(Expression<Func<TEntityType, TKey>> keyDefinitionExpression)
         {
-            ICollection<PropertyInfo> properties = PropertySelectorVisitor.GetSelectedProperties(keyDefinitionExpression);
-            foreach (PropertyInfo property in properties)
+            var properties = PropertySelectorVisitor.GetSelectedProperties(keyDefinitionExpression);
+            foreach (var property in properties)
             {
                 _configuration.HasKey(property);
             }
@@ -164,13 +164,13 @@ namespace Microsoft.AspNetCore.OData.Builder
             Expression<Func<TEntityType, TTargetEntity>> navigationPropertyExpression,
             Expression<Func<TEntityType, TTargetEntity, bool>> referentialConstraintExpression) where TTargetEntity : class
         {
-            NavigationPropertyConfiguration navigation =
+            var navigation =
                 GetOrCreateNavigationProperty(navigationPropertyExpression, EdmMultiplicity.ZeroOrOne);
 
-            IDictionary<PropertyInfo, PropertyInfo> referentialConstraints =
+            var referentialConstraints =
                 PropertyPairSelectorVisitor.GetSelectedProperty(referentialConstraintExpression);
 
-            foreach (KeyValuePair<PropertyInfo, PropertyInfo> constraint in referentialConstraints)
+            foreach (var constraint in referentialConstraints)
             {
                 navigation.HasConstraint(constraint);
             }
@@ -208,13 +208,13 @@ namespace Microsoft.AspNetCore.OData.Builder
             Expression<Func<TEntityType, TTargetEntity>> navigationPropertyExpression,
             Expression<Func<TEntityType, TTargetEntity, bool>> referentialConstraintExpression) where TTargetEntity : class
         {
-            NavigationPropertyConfiguration navigation =
+            var navigation =
                 GetOrCreateNavigationProperty(navigationPropertyExpression, EdmMultiplicity.One);
 
-            IDictionary<PropertyInfo, PropertyInfo> referentialConstraints =
+            var referentialConstraints =
                 PropertyPairSelectorVisitor.GetSelectedProperty(referentialConstraintExpression);
 
-            foreach (KeyValuePair<PropertyInfo, PropertyInfo> constraint in referentialConstraints)
+            foreach (var constraint in referentialConstraints)
             {
                 navigation.HasConstraint(constraint);
             }
@@ -286,7 +286,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             Contract.Assert(_configuration != null && _configuration.ModelBuilder != null);
 
-            ActionConfiguration action = _configuration.ModelBuilder.Action(name);
+            var action = _configuration.ModelBuilder.Action(name);
             action.SetBindingParameter(BindingParameterConfiguration.DefaultBindingParameterName, _configuration);
             return action;
         }
@@ -300,20 +300,20 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             Contract.Assert(_configuration != null && _configuration.ModelBuilder != null);
 
-            FunctionConfiguration function = _configuration.ModelBuilder.Function(name);
+            var function = _configuration.ModelBuilder.Function(name);
             function.SetBindingParameter(BindingParameterConfiguration.DefaultBindingParameterName, _configuration);
             return function;
         }
 
         internal NavigationPropertyConfiguration GetOrCreateNavigationProperty(Expression navigationPropertyExpression, EdmMultiplicity multiplicity)
         {
-            PropertyInfo navigationProperty = PropertySelectorVisitor.GetSelectedProperty(navigationPropertyExpression);
+            var navigationProperty = PropertySelectorVisitor.GetSelectedProperty(navigationPropertyExpression);
             return _configuration.AddNavigationProperty(navigationProperty, multiplicity);
         }
 
         internal NavigationPropertyConfiguration GetOrCreateContainedNavigationProperty(Expression navigationPropertyExpression, EdmMultiplicity multiplicity)
         {
-            PropertyInfo navigationProperty = PropertySelectorVisitor.GetSelectedProperty(navigationPropertyExpression);
+            var navigationProperty = PropertySelectorVisitor.GetSelectedProperty(navigationPropertyExpression);
             return _configuration.AddContainedNavigationProperty(navigationProperty, multiplicity);
         }
     }

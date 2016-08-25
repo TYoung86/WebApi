@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private static ODataOutputFormatter CreateRawValue(ODataSerializerProvider serializerProvider)
         {
-            ODataOutputFormatter formatter = CreateFormatterWithoutMediaTypes(serializerProvider, ODataPayloadKind.Value);
+            var formatter = CreateFormatterWithoutMediaTypes(serializerProvider, ODataPayloadKind.Value);
             //formatter.MediaTypeMappings.Add(new ODataPrimitiveValueMediaTypeMapping());
             //formatter.MediaTypeMappings.Add(new ODataEnumValueMediaTypeMapping());
             //formatter.MediaTypeMappings.Add(new ODataBinaryValueMediaTypeMapping());
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private static ODataOutputFormatter CreateApplicationJson(ODataSerializerProvider serializerProvider)
         {
-            ODataOutputFormatter formatter = CreateFormatterWithoutMediaTypes(
+            var formatter = CreateFormatterWithoutMediaTypes(
                 serializerProvider,
                 ODataPayloadKind.Feed,
                 ODataPayloadKind.Entry,
@@ -102,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private static ODataOutputFormatter CreateApplicationXml(ODataSerializerProvider serializerProvider)
         {
-            ODataOutputFormatter formatter = CreateFormatterWithoutMediaTypes(
+            var formatter = CreateFormatterWithoutMediaTypes(
                 serializerProvider,
                 ODataPayloadKind.MetadataDocument);
             formatter.SupportedMediaTypes.Add(ODataMediaTypes.ApplicationXml);
@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private static ODataOutputFormatter CreateFormatterWithoutMediaTypes(ODataSerializerProvider serializerProvider, params ODataPayloadKind[] payloadKinds)
         {
-            ODataOutputFormatter formatter = new ODataOutputFormatter(serializerProvider, payloadKinds);
+            var formatter = new ODataOutputFormatter(serializerProvider, payloadKinds);
             AddSupportedEncodings(formatter);
             return formatter;
         }

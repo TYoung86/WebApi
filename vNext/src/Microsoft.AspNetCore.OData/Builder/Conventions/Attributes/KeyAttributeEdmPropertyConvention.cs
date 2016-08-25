@@ -14,9 +14,8 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
     internal class KeyAttributeEdmPropertyConvention : AttributeEdmPropertyConvention<StructuralPropertyConfiguration>
     {
         public KeyAttributeEdmPropertyConvention()
-            : base(attribute => attribute.GetType() == typeof(KeyAttribute), allowMultiple: false)
-        {
-        }
+            : base(attribute => attribute is KeyAttribute, allowMultiple: false)
+        {}
 
         /// <summary>
         /// Configures the property as a key on the edm type.
@@ -30,19 +29,14 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
             Attribute attribute,
             ODataConventionModelBuilder model)
         {
-            if (edmProperty == null)
-            {
-                throw Error.ArgumentNull("edmProperty");
-            }
+	        if (edmProperty == null)
+		        throw Error.ArgumentNull("edmProperty");
 
-            if (edmProperty.Kind == PropertyKind.Primitive || edmProperty.Kind == PropertyKind.Enum)
-            {
-                EntityTypeConfiguration entity = structuralTypeConfiguration as EntityTypeConfiguration;
-                if (entity != null)
-                {
-                    entity.HasKey(edmProperty.PropertyInfo);
-                }
-            }
+	        if (edmProperty.Kind != PropertyKind.Primitive && edmProperty.Kind != PropertyKind.Enum)
+				return;
+
+	        var entity = structuralTypeConfiguration as EntityTypeConfiguration;
+	        entity?.HasKey(edmProperty.PropertyInfo);
         }
     }
 }

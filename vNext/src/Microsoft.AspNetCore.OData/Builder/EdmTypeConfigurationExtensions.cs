@@ -41,10 +41,10 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("entity");
             }
 
-            EntityTypeConfiguration baseType = entity.BaseType;
+            var baseType = entity.BaseType;
             while (baseType != null)
             {
-                foreach (PropertyConfiguration property in baseType.Properties)
+                foreach (var property in baseType.Properties)
                 {
                     yield return property;
                 }
@@ -61,10 +61,10 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("complex");
             }
 
-            ComplexTypeConfiguration baseType = complex.BaseType;
+            var baseType = complex.BaseType;
             while (baseType != null)
             {
-                foreach (PropertyConfiguration property in baseType.Properties)
+                foreach (var property in baseType.Properties)
                 {
                     yield return property;
                 }
@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (structuralType.Kind == EdmTypeKind.Entity)
             {
-                EntityTypeConfiguration entity = (EntityTypeConfiguration)structuralType;
+                var entity = (EntityTypeConfiguration)structuralType;
 
                 entity = entity.BaseType;
                 while (entity != null)
@@ -130,7 +130,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (structuralType.Kind == EdmTypeKind.Complex)
             {
-                ComplexTypeConfiguration complex = (ComplexTypeConfiguration)structuralType;
+                var complex = (ComplexTypeConfiguration)structuralType;
 
                 complex = complex.BaseType;
                 while (complex != null)
@@ -181,10 +181,10 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("entity");
             }
 
-            IEnumerable<EntityTypeConfiguration> derivedEntities = modelBuilder.StructuralTypes
+            var derivedEntities = modelBuilder.StructuralTypes
                 .OfType<EntityTypeConfiguration>().Where(e => e.BaseType == entity);
 
-            foreach (EntityTypeConfiguration derivedType in derivedEntities)
+            foreach (var derivedType in derivedEntities)
             {
                 yield return derivedType;
                 foreach (EntityTypeConfiguration derivedDerivedType in modelBuilder.DerivedTypes(derivedType))
@@ -207,10 +207,10 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("complex");
             }
 
-            IEnumerable<ComplexTypeConfiguration> derivedComplexs =
+            var derivedComplexs =
                 modelBuilder.StructuralTypes.OfType<ComplexTypeConfiguration>().Where(e => e.BaseType == complex);
 
-            foreach (ComplexTypeConfiguration derivedType in derivedComplexs)
+            foreach (var derivedType in derivedComplexs)
             {
                 yield return derivedType;
                 foreach (ComplexTypeConfiguration derivedDerivedType in modelBuilder.DerivedTypes(derivedType))
@@ -225,7 +225,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             if (structuralType.Kind == EdmTypeKind.Entity && baseStructuralType.Kind == EdmTypeKind.Entity)
             {
-                EntityTypeConfiguration entity = (EntityTypeConfiguration)structuralType;
+                var entity = (EntityTypeConfiguration)structuralType;
                 while (entity != null)
                 {
                     if (baseStructuralType == entity)
@@ -238,7 +238,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             }
             else if (structuralType.Kind == EdmTypeKind.Complex && baseStructuralType.Kind == EdmTypeKind.Complex)
             {
-                ComplexTypeConfiguration complex = (ComplexTypeConfiguration)structuralType;
+                var complex = (ComplexTypeConfiguration)structuralType;
                 while (complex != null)
                 {
                     if (baseStructuralType == complex)

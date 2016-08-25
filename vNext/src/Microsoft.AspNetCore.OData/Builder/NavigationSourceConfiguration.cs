@@ -188,7 +188,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("navigationLinkBuilder");
             }
 
-            EntityTypeConfiguration declaringEntityType = navigationProperty.DeclaringEntityType;
+            var declaringEntityType = navigationProperty.DeclaringEntityType;
             if (!(declaringEntityType.IsAssignableFrom(EntityType) || EntityType.IsAssignableFrom(declaringEntityType)))
             {
                 throw Error.Argument("navigationProperty", SRResources.NavigationPropertyNotInHierarchy,
@@ -218,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("navigationLinkBuilder");
             }
 
-            foreach (NavigationPropertyConfiguration navigationProperty in navigationProperties)
+            foreach (var navigationProperty in navigationProperties)
             {
                 HasNavigationPropertyLink(navigationProperty, navigationLinkBuilder);
             }
@@ -245,7 +245,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("targetNavigationSource");
             }
 
-            EntityTypeConfiguration declaringEntityType = navigationConfiguration.DeclaringEntityType;
+            var declaringEntityType = navigationConfiguration.DeclaringEntityType;
             if (!(declaringEntityType.IsAssignableFrom(EntityType) || EntityType.IsAssignableFrom(declaringEntityType)))
             {
                 throw Error.Argument("navigationConfiguration", SRResources.NavigationPropertyNotInHierarchy,
@@ -318,8 +318,8 @@ namespace Microsoft.AspNetCore.OData.Builder
                 return null;
             }
 
-            bool hasSingletonAttribute = navigationConfiguration.PropertyInfo.GetCustomAttributes<SingletonAttribute>().Any();
-            Type entityType = navigationConfiguration.RelatedClrType;
+            var hasSingletonAttribute = navigationConfiguration.PropertyInfo.GetCustomAttributes<SingletonAttribute>().Any();
+            var entityType = navigationConfiguration.RelatedClrType;
 
             INavigationSourceConfiguration[] matchedNavigationSources;
             if (hasSingletonAttribute)

@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
         /// <param name="model">The model that this edm type belongs to.</param>
         public void Apply(IEdmTypeConfiguration edmTypeConfiguration, ODataConventionModelBuilder model)
         {
-            TEdmTypeConfiguration type = edmTypeConfiguration as TEdmTypeConfiguration;
+            var type = edmTypeConfiguration as TEdmTypeConfiguration;
             if (type != null)
             {
                 Apply(type, model);
@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                 throw Error.ArgumentNull("edmTypeConfiguration");
             }
 
-            foreach (Attribute attribute in GetAttributes(edmTypeConfiguration.ClrType))
+            foreach (var attribute in GetAttributes(edmTypeConfiguration.ClrType))
             {
                 Apply(edmTypeConfiguration, model, attribute);
             }

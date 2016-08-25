@@ -44,11 +44,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull("writeContext");
             }
 
-            IEdmTypeReference collectionType = writeContext.GetEdmType(graph, type);
+            var collectionType = writeContext.GetEdmType(graph, type);
             Contract.Assert(collectionType != null);
 
-            IEdmTypeReference elementType = GetElementType(collectionType);
-            ODataCollectionWriter writer = messageWriter.CreateODataCollectionWriter(elementType);
+            var elementType = GetElementType(collectionType);
+            var writer = messageWriter.CreateODataCollectionWriter(elementType);
             WriteCollection(writer, graph, collectionType.AsCollection(), writeContext);
         }
 
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw new SerializationException(Error.Format(SRResources.NullCollectionsCannotBeSerialized));
             }
 
-            IEnumerable enumerable = graph as IEnumerable;
+            var enumerable = graph as IEnumerable;
             if (enumerable == null)
             {
                 throw Error.Argument("graph", SRResources.ArgumentMustBeOfType, typeof(IEnumerable).Name);
@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull("expectedType");
             }
 
-            IEdmTypeReference elementType = GetElementType(expectedType);
+            var elementType = GetElementType(expectedType);
 
             return CreateODataCollectionValue(enumerable, elementType, writeContext);
         }
@@ -91,13 +91,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull("writer");
             }
 
-            ODataCollectionValue collectionValue = CreateODataValue(graph, collectionType, writeContext) as ODataCollectionValue;
+            var collectionValue = CreateODataValue(graph, collectionType, writeContext) as ODataCollectionValue;
 
             writer.WriteStart(new ODataCollectionStart { Name = writeContext.RootElementName });
 
             if (collectionValue != null)
             {
-                foreach (object item in collectionValue.Items)
+                foreach (var item in collectionValue.Items)
                 {
                     writer.WriteItem(item);
                 }
@@ -130,7 +130,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             if (enumerable != null)
             {
                 ODataEdmTypeSerializer itemSerializer = null;
-                foreach (object item in enumerable)
+                foreach (var item in enumerable)
                 {
                     if (item == null)
                     {
@@ -143,7 +143,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         throw new SerializationException(SRResources.NullElementInCollection);
                     }
 
-                    IEdmTypeReference actualType = writeContext.GetEdmType(item, item.GetType());
+                    var actualType = writeContext.GetEdmType(item, item.GetType());
                     Contract.Assert(actualType != null);
 
                     itemSerializer = itemSerializer ?? SerializerProvider.GetEdmTypeSerializer(actualType);
@@ -166,11 +166,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // But ODataLib currently doesn't support .FullName() for collections. As a workaround, we construct the
             // collection type name the hard way.
             // Work around for primitive type arrays
-            string typeName = "Collection(" + elementType.FullName().Replace("System","Edm") + ")";
+            var typeName = "Collection(" + elementType.FullName().Replace("System","Edm") + ")";
 
             // ODataCollectionValue is only a V3 property, arrays inside Complex Types or Entity types are only supported in V3
             // if a V1 or V2 Client requests a type that has a collection within it ODataLib will throw.
-            ODataCollectionValue value = new ODataCollectionValue
+            var value = new ODataCollectionValue
             {
                 Items = valueCollection,
                 TypeName = typeName
@@ -253,7 +253,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return feedType.AsCollection().ElementType();
             }
 
-            string message = Error.Format(SRResources.CannotWriteType, typeof(ODataFeedSerializer).Name, feedType.FullName());
+            var message = Error.Format(SRResources.CannotWriteType, typeof(ODataFeedSerializer).Name, feedType.FullName());
             throw new SerializationException(message);
         }
     }

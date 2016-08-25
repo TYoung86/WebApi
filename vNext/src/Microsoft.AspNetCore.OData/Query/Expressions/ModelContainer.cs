@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         public static string GetModelID(IEdmModel model)
         {
-            string index = _map.GetOrAdd(model, m => Guid.NewGuid().ToString());
+            var index = _map.GetOrAdd(model, m => Guid.NewGuid().ToString());
             _reverseMap.TryAdd(index, model);
             return index;
         }

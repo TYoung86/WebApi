@@ -34,8 +34,8 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                 throw Error.ArgumentNull("edmProperty");
             }
 
-            EntityTypeConfiguration entityType = structuralTypeConfiguration as EntityTypeConfiguration;
-            PrimitivePropertyConfiguration primitiveProperty = edmProperty as PrimitivePropertyConfiguration;
+            var entityType = structuralTypeConfiguration as EntityTypeConfiguration;
+            var primitiveProperty = edmProperty as PrimitivePropertyConfiguration;
             if (entityType != null && primitiveProperty != null)
             {
                 primitiveProperty.ConcurrencyToken = true;

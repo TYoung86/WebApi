@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         public ActionConfiguration Action(string name)
         {
             Contract.Assert(ModelBuilder != null);
-            ActionConfiguration configuration = ModelBuilder.Action(name);
+            var configuration = ModelBuilder.Action(name);
             configuration.SetBindingParameter(BindingParameterConfiguration.DefaultBindingParameterName, this);
             return configuration;
         }
@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         public FunctionConfiguration Function(string name)
         {
             Contract.Assert(ModelBuilder != null);
-            FunctionConfiguration configuration = ModelBuilder.Function(name);
+            var configuration = ModelBuilder.Function(name);
             configuration.SetBindingParameter(BindingParameterConfiguration.DefaultBindingParameterName, this);
             return configuration;
         }

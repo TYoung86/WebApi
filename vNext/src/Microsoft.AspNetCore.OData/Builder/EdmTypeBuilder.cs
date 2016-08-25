@@ -42,17 +42,17 @@ namespace Microsoft.AspNetCore.OData.Builder
             _openTypes.Clear();
 
             // Create headers to allow CreateEdmTypeBody to blindly references other things.
-            foreach (IEdmTypeConfiguration config in _configurations)
+            foreach (var config in _configurations)
             {
                 CreateEdmTypeHeader(config);
             }
 
-            foreach (IEdmTypeConfiguration config in _configurations)
+            foreach (var config in _configurations)
             {
                 CreateEdmTypeBody(config);
             }
 
-            foreach (EntityTypeConfiguration entity in _configurations.OfType<EntityTypeConfiguration>())
+            foreach (var entity in _configurations.OfType<EntityTypeConfiguration>())
             {
                 CreateNavigationProperty(entity);
             }
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             {
                 if (config.Kind == EdmTypeKind.Complex)
                 {
-                    ComplexTypeConfiguration complex = (ComplexTypeConfiguration)config;
+                    var complex = (ComplexTypeConfiguration)config;
                     IEdmComplexType baseType = null;
                     if (complex.BaseType != null)
                     {
@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                         Contract.Assert(baseType != null);
                     }
 
-                    EdmComplexType complexType = new EdmComplexType(config.Namespace, config.Name,
+                    var complexType = new EdmComplexType(config.Namespace, config.Name,
                         baseType, complex.IsAbstract ?? false, complex.IsOpen);
 
                     _types.Add(config.ClrType, complexType);
@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 }
                 else if (config.Kind == EdmTypeKind.Entity)
                 {
-                    EntityTypeConfiguration entity = config as EntityTypeConfiguration;
+                    var entity = config as EntityTypeConfiguration;
                     Contract.Assert(entity != null);
 
                     IEdmEntityType baseType = null;
@@ -101,7 +101,11 @@ namespace Microsoft.AspNetCore.OData.Builder
                         Contract.Assert(baseType != null);
                     }
 
-                    EdmEntityType entityType = new EdmEntityType(config.Namespace, config.Name, baseType,
+	                if (!(entity.IsAbstract ?? false) && !entity.Keys.Any() && entity.Properties.Any()) {
+		                entity.IsAbstract = true;
+	                }
+
+                    var entityType = new EdmEntityType(config.Namespace, config.Name, baseType,
                         entity.IsAbstract ?? false, entity.IsOpen);
                     _types.Add(config.ClrType, entityType);
 
@@ -113,7 +117,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 }
                 else
                 {
-                    EnumTypeConfiguration enumTypeConfiguration = config as EnumTypeConfiguration;
+                    var enumTypeConfiguration = config as EnumTypeConfiguration;
 
                     // The config has to be enum.
                     Contract.Assert(enumTypeConfiguration != null);
@@ -127,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private void CreateEdmTypeBody(IEdmTypeConfiguration config)
         {
-            IEdmType edmType = GetEdmType(config.ClrType);
+            var edmType = GetEdmType(config.ClrType);
 
             if (edmType.TypeKind == EdmTypeKind.Complex)
             {
@@ -146,21 +150,21 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private void CreateStructuralTypeBody(EdmStructuredType type, StructuralTypeConfiguration config)
         {
-            foreach (PropertyConfiguration property in config.Properties)
+            foreach (var property in config.Properties)
             {
                 IEdmProperty edmProperty = null;
 
                 switch (property.Kind)
                 {
                     case PropertyKind.Primitive:
-                        PrimitivePropertyConfiguration primitiveProperty = property as PrimitivePropertyConfiguration;
-                        EdmPrimitiveTypeKind typeKind = GetTypeKind(primitiveProperty.PropertyInfo.PropertyType);
+                        var primitiveProperty = property as PrimitivePropertyConfiguration;
+                        var typeKind = GetTypeKind(primitiveProperty.PropertyInfo.PropertyType);
                         IEdmTypeReference primitiveTypeReference = EdmCoreModel.Instance.GetPrimitive(
                             typeKind,
                             primitiveProperty.OptionalProperty);
 
                         // Set concurrency token if is entity type, and concurrency token is true
-                        EdmConcurrencyMode concurrencyMode = EdmConcurrencyMode.None;
+                        var concurrencyMode = EdmConcurrencyMode.None;
                         if (config.Kind == EdmTypeKind.Entity && primitiveProperty.ConcurrencyToken)
                         {
                             concurrencyMode = EdmConcurrencyMode.Fixed;
@@ -173,8 +177,8 @@ namespace Microsoft.AspNetCore.OData.Builder
                         break;
 
                     case PropertyKind.Complex:
-                        ComplexPropertyConfiguration complexProperty = property as ComplexPropertyConfiguration;
-                        IEdmComplexType complexType = GetEdmType(complexProperty.RelatedClrType) as IEdmComplexType;
+                        var complexProperty = property as ComplexPropertyConfiguration;
+                        var complexType = GetEdmType(complexProperty.RelatedClrType) as IEdmComplexType;
 
                         edmProperty = type.AddStructuralProperty(
                             complexProperty.Name,
@@ -211,27 +215,27 @@ namespace Microsoft.AspNetCore.OData.Builder
         private IEdmProperty CreateStructuralTypeCollectionPropertyBody(EdmStructuredType type, CollectionPropertyConfiguration collectionProperty)
         {
             IEdmTypeReference elementTypeReference = null;
-            Type clrType = TypeHelper.GetUnderlyingTypeOrSelf(collectionProperty.ElementType);
+            var clrType = TypeHelper.GetUnderlyingTypeOrSelf(collectionProperty.ElementType);
 
             if (clrType.GetTypeInfo().IsEnum)
             {
-                IEdmType edmType = GetEdmType(clrType);
+                var edmType = GetEdmType(clrType);
 
                 if (edmType == null)
                 {
                     throw Error.InvalidOperation(SRResources.EnumTypeDoesNotExist, clrType.Name);
                 }
 
-                IEdmEnumType enumElementType = (IEdmEnumType)edmType;
-                bool isNullable = collectionProperty.ElementType != clrType;
+                var enumElementType = (IEdmEnumType)edmType;
+                var isNullable = collectionProperty.ElementType != clrType;
                 elementTypeReference = new EdmEnumTypeReference(enumElementType, isNullable);
             }
             else
             {
-                IEdmType edmType = GetEdmType(collectionProperty.ElementType);
+                var edmType = GetEdmType(collectionProperty.ElementType);
                 if (edmType != null)
                 {
-                    IEdmComplexType elementType = edmType as IEdmComplexType;
+                    var elementType = edmType as IEdmComplexType;
                     // Work around for primitive types (ex: Int32 would be typed to System.Int32 instead of EdmInt)
                     if (elementType != null)
                     {
@@ -259,19 +263,19 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private IEdmProperty CreateStructuralTypeEnumPropertyBody(EdmStructuredType type, StructuralTypeConfiguration config, EnumPropertyConfiguration enumProperty)
         {
-            Type enumPropertyType = TypeHelper.GetUnderlyingTypeOrSelf(enumProperty.RelatedClrType);
-            IEdmType edmType = GetEdmType(enumPropertyType);
+            var enumPropertyType = TypeHelper.GetUnderlyingTypeOrSelf(enumProperty.RelatedClrType);
+            var edmType = GetEdmType(enumPropertyType);
 
             if (edmType == null)
             {
                 throw Error.InvalidOperation(SRResources.EnumTypeDoesNotExist, enumPropertyType.Name);
             }
 
-            IEdmEnumType enumType = (IEdmEnumType)edmType;
+            var enumType = (IEdmEnumType)edmType;
             IEdmTypeReference enumTypeReference = new EdmEnumTypeReference(enumType, enumProperty.OptionalProperty);
 
             // Set concurrency token if is entity type, and concurrency token is true
-            EdmConcurrencyMode enumConcurrencyMode = EdmConcurrencyMode.None;
+            var enumConcurrencyMode = EdmConcurrencyMode.None;
             if (config.Kind == EdmTypeKind.Entity && enumProperty.ConcurrencyToken)
             {
                 enumConcurrencyMode = EdmConcurrencyMode.Fixed;
@@ -298,7 +302,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             Contract.Assert(config != null);
 
             CreateStructuralTypeBody(type, config);
-            IEnumerable<IEdmStructuralProperty> keys = config.Keys.Select(p => type.DeclaredProperties.OfType<IEdmStructuralProperty>().First(dp => dp.Name == p.Name));
+            var keys = config.Keys.Select(p => type.DeclaredProperties.OfType<IEdmStructuralProperty>().First(dp => dp.Name == p.Name));
             type.AddKeys(keys);
 
             // Add the Enum keys
@@ -310,11 +314,11 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             Contract.Assert(config != null);
 
-            EdmEntityType type = (EdmEntityType)(GetEdmType(config.ClrType));
+            var type = (EdmEntityType)(GetEdmType(config.ClrType));
 
-            foreach (NavigationPropertyConfiguration navProp in config.NavigationProperties)
+            foreach (var navProp in config.NavigationProperties)
             {
-                EdmNavigationPropertyInfo info = new EdmNavigationPropertyInfo
+                var info = new EdmNavigationPropertyInfo
                 {
                     Name = navProp.Name,
                     TargetMultiplicity = navProp.Multiplicity,
@@ -351,7 +355,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         private IList<IEdmStructuralProperty> GetDeclaringPropertyInfo(IEnumerable<PropertyInfo> propertyInfos)
         {
             IList<IEdmProperty> edmProperties = new List<IEdmProperty>();
-            foreach (PropertyInfo propInfo in propertyInfos)
+            foreach (var propInfo in propertyInfos)
             {
                 IEdmProperty edmProperty;
                 if (_properties.TryGetValue(propInfo, out edmProperty))
@@ -361,10 +365,10 @@ namespace Microsoft.AspNetCore.OData.Builder
                 else
                 {
                     Contract.Assert(propInfo.DeclaringType != null);
-                    Type baseType = propInfo.DeclaringType;
+                    var baseType = propInfo.DeclaringType;
                     while (baseType != null)
                     {
-                        PropertyInfo basePropInfo = baseType.GetProperty(propInfo.Name);
+                        var basePropInfo = baseType.GetProperty(propInfo.Name);
                         if (_properties.TryGetValue(basePropInfo, out edmProperty))
                         {
                             edmProperties.Add(edmProperty);
@@ -386,7 +390,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             Contract.Assert(type != null);
             Contract.Assert(config != null);
 
-            foreach (EnumMemberConfiguration member in config.Members)
+            foreach (var member in config.Members)
             {
                 // EdmIntegerConstant can only support a value of long type.
                 long value;
@@ -399,7 +403,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                     throw Error.Argument("value", SRResources.EnumValueCannotBeLong, Enum.GetName(member.MemberInfo.GetType(), member.MemberInfo));
                 }
 
-                EdmEnumMember edmMember = new EdmEnumMember(type, member.Name,
+                var edmMember = new EdmEnumMember(type, member.Name,
                     new EdmIntegerConstant(value));
                 type.AddMember(edmMember);
                 _members[member.MemberInfo] = edmMember;
@@ -429,7 +433,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("configurations");
             }
 
-            EdmTypeBuilder builder = new EdmTypeBuilder(configurations);
+            var builder = new EdmTypeBuilder(configurations);
             return new EdmTypeMap(builder.GetEdmTypes(),
                 builder._properties,
                 builder._propertiesRestrictions,
@@ -444,7 +448,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         /// <returns>The corresponding Edm primitive kind.</returns>
         public static EdmPrimitiveTypeKind GetTypeKind(Type clrType)
         {
-            IEdmPrimitiveType primitiveType = EdmLibHelpers.GetEdmPrimitiveTypeOrNull(clrType);
+            var primitiveType = EdmLibHelpers.GetEdmPrimitiveTypeOrNull(clrType);
             if (primitiveType == null)
             {
                 throw Error.Argument("clrType", SRResources.MustBePrimitiveType, clrType.FullName);

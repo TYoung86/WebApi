@@ -49,11 +49,11 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("model");
             }
 
-            IEdmEntityType elementType = navigationSource.EntityType();
-            IEnumerable<IEdmEntityType> derivedTypes = model.FindAllDerivedTypes(elementType).Cast<IEdmEntityType>();
+            var elementType = navigationSource.EntityType();
+            var derivedTypes = model.FindAllDerivedTypes(elementType).Cast<IEdmEntityType>();
 
             // Add navigation link builders for all navigation properties of entity.
-            foreach (IEdmNavigationProperty navigationProperty in elementType.NavigationProperties())
+            foreach (var navigationProperty in elementType.NavigationProperties())
             {
                 Func<EntityInstanceContext, IEdmNavigationProperty, Uri> navigationLinkFactory =
                     (entityInstanceContext, navProperty) => entityInstanceContext.GenerateNavigationPropertyLink(navProperty, includeCast: false);
@@ -61,10 +61,10 @@ namespace Microsoft.AspNetCore.OData.Builder
             }
 
             // Add navigation link builders for all navigation properties in derived types.
-            bool derivedTypesDefineNavigationProperty = false;
-            foreach (IEdmEntityType derivedEntityType in derivedTypes)
+            var derivedTypesDefineNavigationProperty = false;
+            foreach (var derivedEntityType in derivedTypes)
             {
-                foreach (IEdmNavigationProperty navigationProperty in derivedEntityType.DeclaredNavigationProperties())
+                foreach (var navigationProperty in derivedEntityType.DeclaredNavigationProperties())
                 {
                     derivedTypesDefineNavigationProperty = true;
                     Func<EntityInstanceContext, IEdmNavigationProperty, Uri> navigationLinkFactory =
@@ -129,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         /// </summary>
         public virtual EntitySelfLinks BuildEntitySelfLinks(EntityInstanceContext instanceContext, ODataMetadataLevel metadataLevel)
         {
-            EntitySelfLinks selfLinks = new EntitySelfLinks();
+            var selfLinks = new EntitySelfLinks();
             selfLinks.IdLink = BuildIdLink(instanceContext, metadataLevel);
             selfLinks.EditLink = BuildEditLink(instanceContext, metadataLevel, selfLinks.IdLink);
             selfLinks.ReadLink = BuildReadLink(instanceContext, metadataLevel, selfLinks.EditLink);

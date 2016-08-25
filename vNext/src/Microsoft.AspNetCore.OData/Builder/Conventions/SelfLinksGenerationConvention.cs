@@ -19,12 +19,12 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
             }
 
             // Configure the self link for the feed
-            EntitySetConfiguration entitySet = configuration as EntitySetConfiguration;
+            var entitySet = configuration as EntitySetConfiguration;
             if (entitySet != null && (entitySet.GetFeedSelfLink() == null))
             {
                 entitySet.HasFeedSelfLink(feedContext =>
                 {
-                    string selfLink = feedContext.Url.CreateODataLink(new EntitySetPathSegment(feedContext.EntitySetBase));
+                    var selfLink = feedContext.Url.CreateODataLink(new EntitySetPathSegment(feedContext.EntitySetBase));
 
                     if (selfLink == null)
                     {
@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
 
             if (configuration.GetEditLink() == null)
             {
-                bool derivedTypesDefineNavigationProperty = model.DerivedTypes(configuration.EntityType)
+                var derivedTypesDefineNavigationProperty = model.DerivedTypes(configuration.EntityType)
                     .OfType<EntityTypeConfiguration>().Any(e => e.NavigationProperties.Any());
 
                 // generate links with cast if any of the derived types define a navigation property

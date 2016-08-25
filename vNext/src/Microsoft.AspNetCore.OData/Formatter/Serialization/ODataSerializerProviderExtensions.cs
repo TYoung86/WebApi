@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             Contract.Assert(instance != null);
 
-            IEdmObject edmObject = instance as IEdmObject;
+            var edmObject = instance as IEdmObject;
             if (edmObject != null)
             {
                 return serializerProvider.GetEdmTypeSerializer(edmObject.GetEdmType());

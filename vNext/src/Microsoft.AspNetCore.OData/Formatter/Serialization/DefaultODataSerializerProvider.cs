@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     return _primitiveSerializer;
 
                 case EdmTypeKind.Collection:
-                    IEdmCollectionTypeReference collectionType = edmType.AsCollection();
+                    var collectionType = edmType.AsCollection();
                     if (collectionType.Definition.IsDeltaFeed())
                     {
                         return _deltaFeedSerializer;
@@ -139,8 +139,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             // if it is not a special type, assume it has a corresponding EdmType.
-            ClrTypeCache typeMappingCache = model.GetTypeMappingCache();
-            IEdmTypeReference edmType = typeMappingCache.GetEdmType(type, model);
+            var typeMappingCache = model.GetTypeMappingCache();
+            var edmType = typeMappingCache.GetEdmType(type, model);
 
             if (edmType != null)
             {

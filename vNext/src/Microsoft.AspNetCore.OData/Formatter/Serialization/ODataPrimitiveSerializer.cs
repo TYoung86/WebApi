@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.Argument("writeContext", SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
             }
 
-            IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
+            var edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
             messageWriter.WriteProperty(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext));
@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.InvalidOperation(SRResources.CannotWriteType, typeof(ODataPrimitiveSerializer), expectedType.FullName());
             }
 
-            ODataPrimitiveValue value = CreateODataPrimitiveValue(graph, expectedType.AsPrimitive(), writeContext);
+            var value = CreateODataPrimitiveValue(graph, expectedType.AsPrimitive(), writeContext);
             if (value == null)
             {
                 return new ODataNullValue();
@@ -88,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             Contract.Assert(primitive != null);
 
-            object value = primitive.Value;
+            var value = primitive.Value;
             string typeName = null; // Set null to force the type name not to serialize.
 
             // Provide the type name to serialize.
@@ -111,8 +111,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return null;
             }
 
-            object supportedValue = ConvertUnsupportedPrimitives(value);
-            ODataPrimitiveValue primitive = new ODataPrimitiveValue(supportedValue);
+            var supportedValue = ConvertUnsupportedPrimitives(value);
+            var primitive = new ODataPrimitiveValue(supportedValue);
 
             if (writeContext != null)
             {
@@ -126,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (value != null)
             {
-                Type type = value.GetType();
+                var type = value.GetType();
 
                 // Note that type cannot be a nullable type as value is not null and it is boxed.
                 switch (type.GetTypeCode())
@@ -144,14 +144,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         return checked((long)(ulong)value);
 
                     case TypeCode.DateTime:
-                        DateTime dateTime = (DateTime)value;
-                        TimeZoneInfo timeZone = TimeZoneInfoHelper.TimeZone;
+                        var dateTime = (DateTime)value;
+                        var timeZone = TimeZoneInfoHelper.TimeZone;
                         if (dateTime.Kind == DateTimeKind.Utc || dateTime.Kind == DateTimeKind.Local)
                         {
                             return new DateTimeOffset(dateTime.ToUniversalTime()).ToOffset(timeZone.BaseUtcOffset);
                         }
 
-                        DateTimeOffset dateTimeOffset = new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime));
+                        var dateTimeOffset = new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime));
                         return dateTimeOffset.ToUniversalTime().ToOffset(timeZone.BaseUtcOffset);
 
                     default:
@@ -179,7 +179,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             Contract.Assert(value != null);
 
-            TypeCode typeCode = value.GetType().GetTypeCode();
+            var typeCode = value.GetType().GetTypeCode();
 
             switch (typeCode)
             {
@@ -190,7 +190,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     return true;
                 // The type for a Double can be inferred in JSON ...
                 case TypeCode.Double:
-                    double doubleValue = (double)value;
+                    var doubleValue = (double)value;
                     // ... except for NaN or Infinity (positive or negative).
                     if (Double.IsNaN(doubleValue) || Double.IsInfinity(doubleValue))
                     {

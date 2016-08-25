@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             Contract.Assert(edmModel != null);
             Contract.Assert(clrType != null);
 
-            IEdmPrimitiveType primitiveType = GetEdmPrimitiveTypeOrNull(clrType);
+            var primitiveType = GetEdmPrimitiveTypeOrNull(clrType);
             if (primitiveType != null)
             {
                 return primitiveType;
@@ -128,10 +128,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             {
                 if (testCollections)
                 {
-                    Type enumerableOfT = ExtractGenericInterface(clrType, typeof(IEnumerable<>));
+                    var enumerableOfT = ExtractGenericInterface(clrType, typeof(IEnumerable<>));
                     if (enumerableOfT != null)
                     {
-                        Type elementClrType = enumerableOfT.GetGenericArguments()[0];
+                        var elementClrType = enumerableOfT.GetGenericArguments()[0];
 
                         // IEnumerable<SelectExpandWrapper<T>> is a collection of T.
                         Type entityType;
@@ -140,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                             elementClrType = entityType;
                         }
 
-                        IEdmType elementType = GetEdmType(edmModel, elementClrType, testCollections: false);
+                        var elementType = GetEdmType(edmModel, elementClrType, testCollections: false);
                         if (elementType != null)
                         {
                             return new EdmCollectionType(elementType.ToEdmTypeReference(IsNullable(elementClrType)));
@@ -148,7 +148,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                     }
                 }
 
-                Type underlyingType = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
+                var underlyingType = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
 
                 if (underlyingType.GetTypeInfo().IsEnum)
                 {
@@ -156,7 +156,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 }
 
                 // search for the ClrTypeAnnotation and return it if present
-                IEdmType returnType =
+                var returnType =
                     edmModel
                     .SchemaElements
                     .OfType<IEdmType>()
@@ -179,10 +179,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         public static IEdmTypeReference GetEdmTypeReference(this IEdmModel edmModel, Type clrType)
         {
-            IEdmType edmType = edmModel.GetEdmType(clrType);
+            var edmType = edmModel.GetEdmType(clrType);
             if (edmType != null)
             {
-                bool isNullable = IsNullable(clrType);
+                var isNullable = IsNullable(clrType);
                 return ToEdmTypeReference(edmType, isNullable);
             }
 
@@ -229,7 +229,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("edmTypeReference");
             }
 
-            Type primitiveClrType = _builtInTypesMapping
+            var primitiveClrType = _builtInTypesMapping
                 .Where(kvp => edmTypeReference.Definition.IsEquivalentTo(kvp.Value) && (!edmTypeReference.IsNullable || IsNullable(kvp.Key)))
                 .Select(kvp => kvp.Key)
                 .FirstOrDefault();
@@ -240,7 +240,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             else
             {
-                Type clrType = GetClrType(edmTypeReference.Definition, edmModel, assembliesProvider);
+                var clrType = GetClrType(edmTypeReference.Definition, edmModel, assembliesProvider);
                 if (clrType != null && clrType.GetTypeInfo().IsEnum && edmTypeReference.IsNullable)
                 {
                     return clrType.ToNullable();
@@ -257,18 +257,18 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         public static Type GetClrType(IEdmType edmType, IEdmModel edmModel, IAssemblyProvider assembliesProvider)
         {
-            IEdmSchemaType edmSchemaType = edmType as IEdmSchemaType;
+            var edmSchemaType = edmType as IEdmSchemaType;
 
             Contract.Assert(edmSchemaType != null);
 
-            ClrTypeAnnotation annotation = edmModel.GetAnnotationValue<ClrTypeAnnotation>(edmSchemaType);
+            var annotation = edmModel.GetAnnotationValue<ClrTypeAnnotation>(edmSchemaType);
             if (annotation != null)
             {
                 return annotation.ClrType;
             }
 
-            string typeName = edmSchemaType.FullName();
-            IEnumerable<Type> matchingTypes = GetMatchingTypes(typeName, assembliesProvider);
+            var typeName = edmSchemaType.FullName();
+            var matchingTypes = GetMatchingTypes(typeName, assembliesProvider);
 
             if (matchingTypes.Count() > 1)
             {
@@ -283,37 +283,37 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         public static bool IsNotFilterable(IEdmProperty edmProperty, IEdmModel edmModel)
         {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+            var annotation = GetPropertyRestrictions(edmProperty, edmModel);
             return annotation == null ? false : annotation.Restrictions.NotFilterable;
         }
 
         public static bool IsNotSortable(IEdmProperty edmProperty, IEdmModel edmModel)
         {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+            var annotation = GetPropertyRestrictions(edmProperty, edmModel);
             return annotation == null ? false : annotation.Restrictions.NotSortable;
         }
 
         public static bool IsNotNavigable(IEdmProperty edmProperty, IEdmModel edmModel)
         {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+            var annotation = GetPropertyRestrictions(edmProperty, edmModel);
             return annotation == null ? false : annotation.Restrictions.NotNavigable;
         }
 
         public static bool IsNotExpandable(IEdmProperty edmProperty, IEdmModel edmModel)
         {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+            var annotation = GetPropertyRestrictions(edmProperty, edmModel);
             return annotation == null ? false : annotation.Restrictions.NotExpandable;
         }
 
         public static bool IsNotCountable(IEdmProperty edmProperty, IEdmModel edmModel)
         {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+            var annotation = GetPropertyRestrictions(edmProperty, edmModel);
             return annotation == null ? false : annotation.Restrictions.NotCountable;
         }
 
         public static bool IsAutoExpand(IEdmProperty edmProperty, IEdmModel edmModel)
         {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+            var annotation = GetPropertyRestrictions(edmProperty, edmModel);
             return annotation == null ? false : annotation.Restrictions.AutoExpand;
         }
 
@@ -337,11 +337,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("edmModel");
             }
 
-            string propertyName = edmProperty.Name;
-            ClrPropertyInfoAnnotation annotation = edmModel.GetAnnotationValue<ClrPropertyInfoAnnotation>(edmProperty);
+            var propertyName = edmProperty.Name;
+            var annotation = edmModel.GetAnnotationValue<ClrPropertyInfoAnnotation>(edmProperty);
             if (annotation != null)
             {
-                PropertyInfo propertyInfo = annotation.ClrPropertyInfo;
+                var propertyInfo = annotation.ClrPropertyInfo;
                 if (propertyInfo != null)
                 {
                     propertyName = propertyInfo.Name;
@@ -363,7 +363,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.ArgumentNull("edmModel");
             }
 
-            DynamicPropertyDictionaryAnnotation annotation =
+            var annotation =
                 edmModel.GetAnnotationValue<DynamicPropertyDictionaryAnnotation>(edmType);
             if (annotation != null)
             {
@@ -381,7 +381,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         public static IEdmPrimitiveTypeReference GetEdmPrimitiveTypeReferenceOrNull(Type clrType)
         {
-            IEdmPrimitiveType primitiveType = GetEdmPrimitiveTypeOrNull(clrType);
+            var primitiveType = GetEdmPrimitiveTypeOrNull(clrType);
             return primitiveType != null ? _coreModel.GetPrimitive(primitiveType.PrimitiveKind, IsNullable(clrType)) : null;
         }
 
@@ -389,14 +389,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
         // and returns the corresponding clr type to which we map like uint => long.
         public static Type IsNonstandardEdmPrimitive(Type type, out bool isNonstandardEdmPrimitive)
         {
-            IEdmPrimitiveTypeReference edmType = GetEdmPrimitiveTypeReferenceOrNull(type);
+            var edmType = GetEdmPrimitiveTypeReferenceOrNull(type);
             if (edmType == null)
             {
                 isNonstandardEdmPrimitive = false;
                 return type;
             }
 
-            Type reverseLookupClrType = GetClrType(edmType, EdmCoreModel.Instance);
+            var reverseLookupClrType = GetClrType(edmType, EdmCoreModel.Instance);
             isNonstandardEdmPrimitive = (type != reverseLookupClrType);
 
             return reverseLookupClrType;
@@ -435,24 +435,24 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
 
             IList<IEdmStructuralProperty> results = new List<IEdmStructuralProperty>();
-            IEdmEntityType entityType = entitySet.EntityType();
+            var entityType = entitySet.EntityType();
             var annotations = model.FindVocabularyAnnotations<IEdmValueAnnotation>(entitySet, CoreVocabularyModel.ConcurrencyTerm);
-            IEdmValueAnnotation annotation = annotations.FirstOrDefault();
+            var annotation = annotations.FirstOrDefault();
             if (annotation != null)
             {
-                IEdmCollectionExpression properties = annotation.Value as IEdmCollectionExpression;
+                var properties = annotation.Value as IEdmCollectionExpression;
                 if (properties != null)
                 {
                     foreach (var property in properties.Elements)
                     {
-                        IEdmPathExpression pathExpression = property as IEdmPathExpression;
+                        var pathExpression = property as IEdmPathExpression;
                         if (pathExpression != null)
                         {
                             // So far, we only consider the single path, because only the direct properties from declaring type are used.
                             // However we have an issue tracking on: https://github.com/OData/WebApi/issues/472
-                            string propertyName = pathExpression.Path.Single();
-                            IEdmProperty edmProperty = entityType.FindProperty(propertyName);
-                            IEdmStructuralProperty structuralProperty = edmProperty as IEdmStructuralProperty;
+                            var propertyName = pathExpression.Path.Single();
+                            var edmProperty = entityType.FindProperty(propertyName);
+                            var structuralProperty = edmProperty as IEdmStructuralProperty;
                             if (structuralProperty != null)
                             {
                                 results.Add(structuralProperty);

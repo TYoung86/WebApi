@@ -50,10 +50,10 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull("model");
             }
 
-            HashSet<IEdmStructuralProperty> allStructuralProperties = new HashSet<IEdmStructuralProperty>(entityType.StructuralProperties());
-            HashSet<IEdmNavigationProperty> allNavigationProperties = new HashSet<IEdmNavigationProperty>(entityType.NavigationProperties());
-            HashSet<IEdmAction> allActions = new HashSet<IEdmAction>(model.GetAvailableActions(entityType));
-            HashSet<IEdmFunction> allFunctions = new HashSet<IEdmFunction>(model.GetAvailableFunctions(entityType));
+            var allStructuralProperties = new HashSet<IEdmStructuralProperty>(entityType.StructuralProperties());
+            var allNavigationProperties = new HashSet<IEdmNavigationProperty>(entityType.NavigationProperties());
+            var allActions = new HashSet<IEdmAction>(model.GetAvailableActions(entityType));
+            var allFunctions = new HashSet<IEdmFunction>(model.GetAvailableFunctions(entityType));
 
             if (selectExpandClause == null)
             {
@@ -123,14 +123,14 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private void BuildExpansions(SelectExpandClause selectExpandClause, HashSet<IEdmNavigationProperty> allNavigationProperties)
         {
-            foreach (SelectItem selectItem in selectExpandClause.SelectedItems)
+            foreach (var selectItem in selectExpandClause.SelectedItems)
             {
-                ExpandedNavigationSelectItem expandItem = selectItem as ExpandedNavigationSelectItem;
+                var expandItem = selectItem as ExpandedNavigationSelectItem;
                 if (expandItem != null)
                 {
                     ValidatePathIsSupported(expandItem.PathToNavigationProperty);
-                    NavigationPropertySegment navigationSegment = (NavigationPropertySegment)expandItem.PathToNavigationProperty.LastSegment;
-                    IEdmNavigationProperty navigationProperty = navigationSegment.NavigationProperty;
+                    var navigationSegment = (NavigationPropertySegment)expandItem.PathToNavigationProperty.LastSegment;
+                    var navigationProperty = navigationSegment.NavigationProperty;
                     if (allNavigationProperties.Contains(navigationProperty))
                     {
                         ExpandedNavigationProperties.Add(navigationProperty, expandItem.SelectAndExpand);
@@ -146,24 +146,24 @@ namespace Microsoft.AspNetCore.OData.Query
             HashSet<IEdmAction> allActions,
             HashSet<IEdmFunction> allFunctions)
         {
-            foreach (SelectItem selectItem in selectExpandClause.SelectedItems)
+            foreach (var selectItem in selectExpandClause.SelectedItems)
             {
                 if (selectItem is ExpandedNavigationSelectItem)
                 {
                     continue;
                 }
 
-                PathSelectItem pathSelectItem = selectItem as PathSelectItem;
+                var pathSelectItem = selectItem as PathSelectItem;
 
                 if (pathSelectItem != null)
                 {
                     ValidatePathIsSupported(pathSelectItem.SelectedPath);
-                    ODataPathSegment segment = pathSelectItem.SelectedPath.LastSegment;
+                    var segment = pathSelectItem.SelectedPath.LastSegment;
 
-                    NavigationPropertySegment navigationPropertySegment = segment as NavigationPropertySegment;
+                    var navigationPropertySegment = segment as NavigationPropertySegment;
                     if (navigationPropertySegment != null)
                     {
-                        IEdmNavigationProperty navigationProperty = navigationPropertySegment.NavigationProperty;
+                        var navigationProperty = navigationPropertySegment.NavigationProperty;
                         if (allNavigationProperties.Contains(navigationProperty))
                         {
                             SelectedNavigationProperties.Add(navigationProperty);
@@ -171,10 +171,10 @@ namespace Microsoft.AspNetCore.OData.Query
                         continue;
                     }
 
-                    PropertySegment structuralPropertySegment = segment as PropertySegment;
+                    var structuralPropertySegment = segment as PropertySegment;
                     if (structuralPropertySegment != null)
                     {
-                        IEdmStructuralProperty structuralProperty = structuralPropertySegment.Property;
+                        var structuralProperty = structuralPropertySegment.Property;
                         if (allStructuralProperties.Contains(structuralProperty))
                         {
                             SelectedStructuralProperties.Add(structuralProperty);
@@ -182,14 +182,14 @@ namespace Microsoft.AspNetCore.OData.Query
                         continue;
                     }
 
-                    OperationSegment operationSegment = segment as OperationSegment;
+                    var operationSegment = segment as OperationSegment;
                     if (operationSegment != null)
                     {
                         AddOperations(allActions, allFunctions, operationSegment);
                         continue;
                     }
 
-                    OpenPropertySegment openPropertySegment = segment as OpenPropertySegment;
+                    var openPropertySegment = segment as OpenPropertySegment;
                     if (openPropertySegment != null)
                     {
                         SelectedDynamicProperties.Add(openPropertySegment.PropertyName);
@@ -198,7 +198,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     throw new ODataException(Error.Format(SRResources.SelectionTypeNotSupported, segment.GetType().Name));
                 }
 
-                WildcardSelectItem wildCardSelectItem = selectItem as WildcardSelectItem;
+                var wildCardSelectItem = selectItem as WildcardSelectItem;
                 if (wildCardSelectItem != null)
                 {
                     SelectedStructuralProperties = allStructuralProperties;
@@ -206,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     continue;
                 }
 
-                NamespaceQualifiedWildcardSelectItem wildCardActionSelection = selectItem as NamespaceQualifiedWildcardSelectItem;
+                var wildCardActionSelection = selectItem as NamespaceQualifiedWildcardSelectItem;
                 if (wildCardActionSelection != null)
                 {
                     SelectedActions = allActions;
@@ -220,15 +220,15 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private void AddOperations(HashSet<IEdmAction> allActions, HashSet<IEdmFunction> allFunctions, OperationSegment operationSegment)
         {
-            foreach (IEdmOperation operation in operationSegment.Operations)
+            foreach (var operation in operationSegment.Operations)
             {
-                IEdmAction action = operation as IEdmAction;
+                var action = operation as IEdmAction;
                 if (action != null && allActions.Contains(action))
                 {
                     SelectedActions.Add(action);
                 }
 
-                IEdmFunction function = operation as IEdmFunction;
+                var function = operation as IEdmFunction;
                 if (function != null && allFunctions.Contains(function))
                 {
                     SelectedFunctions.Add(function);
@@ -239,7 +239,7 @@ namespace Microsoft.AspNetCore.OData.Query
         // we only support paths of type 'cast/structuralOrNavPropertyOrAction' and 'structuralOrNavPropertyOrAction'.
         internal static void ValidatePathIsSupported(ODataPath path)
         {
-            int segmentCount = path.Count();
+            var segmentCount = path.Count();
 
             if (segmentCount > 2)
             {
@@ -254,7 +254,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
             }
 
-            ODataPathSegment lastSegment = path.LastSegment;
+            var lastSegment = path.LastSegment;
             if (!(lastSegment is NavigationPropertySegment
                 || lastSegment is PropertySegment
                 || lastSegment is OperationSegment

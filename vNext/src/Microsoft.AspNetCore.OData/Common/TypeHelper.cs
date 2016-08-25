@@ -37,11 +37,11 @@ namespace Microsoft.AspNetCore.OData.Common
 
         internal static IEnumerable<Type> GetLoadedTypes(IAssemblyProvider assemblyProvider)
         {
-            List<Type> result = new List<Type>();
+            var result = new List<Type>();
 
             // Go through all assemblies referenced by the application and search for types matching a predicate
-            IEnumerable<Assembly> assemblies = assemblyProvider.CandidateAssemblies;
-            foreach (Assembly assembly in assemblies)
+            var assemblies = assemblyProvider.CandidateAssemblies;
+            foreach (var assembly in assemblies)
             {
                 Type[] exportedTypes = null;
                 if (assembly == null || assembly.IsDynamic)
@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Common
 
         public static bool IsEnum(Type type)
         {
-            Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(type);
+            var underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(type);
             return underlyingTypeOrSelf.GetTypeInfo().IsEnum;
         }
     }

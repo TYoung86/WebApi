@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.OData
         /// <inheritdoc/>
         public override bool TrySetPropertyValue(string name, object value)
         {
-            IEdmProperty property = _actualEdmType.FindProperty(name);
+            var property = _actualEdmType.FindProperty(name);
             if (property != null || _actualEdmType.IsOpen)
             {
                 _setProperties.Add(name);
@@ -133,7 +133,7 @@ namespace Microsoft.AspNetCore.OData
         /// <inheritdoc/>
         public override bool TryGetPropertyValue(string name, out object value)
         {
-            IEdmProperty property = _actualEdmType.FindProperty(name);
+            var property = _actualEdmType.FindProperty(name);
             if (property != null || _actualEdmType.IsOpen)
             {
                 if (_container.ContainsKey(name))
@@ -159,7 +159,7 @@ namespace Microsoft.AspNetCore.OData
         /// <inheritdoc/>
         public override bool TryGetPropertyType(string name, out Type type)
         {
-            IEdmProperty property = _actualEdmType.FindProperty(name);
+            var property = _actualEdmType.FindProperty(name);
             if (property != null)
             {
                 type = GetClrTypeForUntypedDelta(property.Type);
@@ -214,10 +214,10 @@ namespace Microsoft.AspNetCore.OData
         {
             Contract.Assert(propertyType != null);
 
-            bool isCollection = propertyType.IsCollection();
+            var isCollection = propertyType.IsCollection();
             if (!propertyType.IsNullable || isCollection)
             {
-                Type clrType = GetClrTypeForUntypedDelta(propertyType);
+                var clrType = GetClrTypeForUntypedDelta(propertyType);
 
                 if (propertyType.IsPrimitive() ||
                     (isCollection && propertyType.AsCollection().ElementType().IsPrimitive()))
@@ -254,10 +254,10 @@ namespace Microsoft.AspNetCore.OData
                     return typeof(EdmEnumObject);
 
                 case EdmTypeKind.Collection:
-                    IEdmTypeReference elementType = edmType.AsCollection().ElementType();
+                    var elementType = edmType.AsCollection().ElementType();
                     if (elementType.IsPrimitive())
                     {
-                        Type elementClrType = GetClrTypeForUntypedDelta(elementType);
+                        var elementClrType = GetClrTypeForUntypedDelta(elementType);
                         return typeof(List<>).MakeGenericType(elementClrType);
                     }
                     else if (elementType.IsComplex())

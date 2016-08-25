@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
                 return;
             }
 
-            PropertyConfiguration key = GetKeyProperty(entity);
+            var key = GetKeyProperty(entity);
             if (key != null)
             {
                 entity.HasKey(key.PropertyInfo);
@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
 
         private static PropertyConfiguration GetKeyProperty(EntityTypeConfiguration entityType)
         {
-            IEnumerable<PropertyConfiguration> keys =
+            var keys =
                 entityType.Properties
                 .Where(p => (p.Name.Equals(entityType.Name + "Id", StringComparison.OrdinalIgnoreCase) || p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase))
                 && (EdmLibHelpers.GetEdmPrimitiveTypeOrNull(p.PropertyInfo.PropertyType) != null || TypeHelper.IsEnum(p.PropertyInfo.PropertyType)));

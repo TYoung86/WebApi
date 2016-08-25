@@ -166,12 +166,12 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (!enableUriTemplateParsing && path.LastSegment is Semantic.NavigationPropertyLinkSegment)
             {
-                IEdmCollectionType lastSegmentEdmType = path.LastSegment.EdmType as IEdmCollectionType;
+                var lastSegmentEdmType = path.LastSegment.EdmType as IEdmCollectionType;
 
                 if (lastSegmentEdmType != null)
                 {
                     Semantic.EntityIdSegment entityIdSegment = null;
-                    bool exceptionThrown = false;
+                    var exceptionThrown = false;
 
                     try
                     {
@@ -180,7 +180,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                         if (entityIdSegment != null)
                         {
                             // Create another ODataUriParser to parse $id, which is absolute or relative.
-                            ODataUriParser parser = new ODataUriParser(model, serviceRootUri, entityIdSegment.Id);
+                            var parser = new ODataUriParser(model, serviceRootUri, entityIdSegment.Id);
                             id = parser.ParsePath().LastSegment as Semantic.KeySegment;
                         }
                     }
@@ -202,7 +202,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 }
             }
 
-            ODataPath webAPIPath = ODataPathSegmentTranslator.TranslateODLPathToWebAPIPath(
+            var webAPIPath = ODataPathSegmentTranslator.TranslateODLPathToWebAPIPath(
                 path,
                 model,
                 unresolvedPathSegment,
@@ -221,8 +221,8 @@ namespace Microsoft.AspNetCore.OData.Routing
                 throw new ODataException(Error.Format(SRResources.InvalidODataPathTemplate, pathTemplate));
             }
 
-            List<ODataPathSegmentTemplate> templateSegments = new List<ODataPathSegmentTemplate>();
-            foreach (ODataPathSegment pathSegment in path.Segments)
+            var templateSegments = new List<ODataPathSegmentTemplate>();
+            foreach (var pathSegment in path.Segments)
             {
                 switch (pathSegment.SegmentKind)
                 {
@@ -260,9 +260,9 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(path != null);
             Contract.Assert(model != null);
 
-            foreach (ODataPathSegment segment in path.Segments)
+            foreach (var segment in path.Segments)
             {
-                NavigationPathSegment navigationPathSegment = segment as NavigationPathSegment;
+                var navigationPathSegment = segment as NavigationPathSegment;
 
                 if (navigationPathSegment != null)
                 {

@@ -193,7 +193,7 @@ namespace Microsoft.AspNetCore.OData
             }
             else
             {
-                IEdmTypeReference edmType = EdmObject.GetEdmType();
+                var edmType = EdmObject.GetEdmType();
                 if (edmType == null)
                 {
                     // Provide general guidance in the message. typeof(IEdmTypeReference).Name would be too specific.
@@ -212,20 +212,20 @@ namespace Microsoft.AspNetCore.OData
                 return null;
             }
 
-            TypedEdmEntityObject edmEntityObject = EdmObject as TypedEdmEntityObject;
+            var edmEntityObject = EdmObject as TypedEdmEntityObject;
             if (edmEntityObject != null)
             {
                 return edmEntityObject.Instance;
             }
 
-            Type clrType = EdmLibHelpers.GetClrType(EntityType, EdmModel);
+            var clrType = EdmLibHelpers.GetClrType(EntityType, EdmModel);
             if (clrType == null)
             {
                 throw new InvalidOperationException(Error.Format(SRResources.MappingDoesNotContainEntityType, EntityType.FullName()));
             }
 
-            object resource = Activator.CreateInstance(clrType);
-            foreach (IEdmStructuralProperty property in EntityType.StructuralProperties())
+            var resource = Activator.CreateInstance(clrType);
+            foreach (var property in EntityType.StructuralProperties())
             {
                 object value;
                 if (EdmObject.TryGetPropertyValue(property.Name, out value) && value != null)
@@ -251,7 +251,7 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentNull("entityType");
             }
 
-            IEdmEntityObject edmEntityObject = entityInstance as IEdmEntityObject;
+            var edmEntityObject = entityInstance as IEdmEntityObject;
             if (edmEntityObject != null)
             {
                 return edmEntityObject;

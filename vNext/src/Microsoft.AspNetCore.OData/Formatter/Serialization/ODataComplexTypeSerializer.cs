@@ -43,10 +43,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.Argument("writeContext", SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
             }
 
-            IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
+            var edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
-            ODataProperty property = CreateProperty(graph, edmType, writeContext.RootElementName, writeContext);
+            var property = CreateProperty(graph, edmType, writeContext.RootElementName, writeContext);
             messageWriter.WriteProperty(property);
         }
 
@@ -88,13 +88,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return null;
             }
 
-            IEdmComplexObject complexObject = graph as IEdmComplexObject ?? new TypedEdmComplexObject(graph, complexType, writeContext.Model);
+            var complexObject = graph as IEdmComplexObject ?? new TypedEdmComplexObject(graph, complexType, writeContext.Model);
 
-            List<ODataProperty> propertyCollection = new List<ODataProperty>();
-            foreach (IEdmProperty property in complexType.ComplexDefinition().Properties())
+            var propertyCollection = new List<ODataProperty>();
+            foreach (var property in complexType.ComplexDefinition().Properties())
             {
-                IEdmTypeReference propertyType = property.Type;
-                ODataEdmTypeSerializer propertySerializer = SerializerProvider.GetEdmTypeSerializer(propertyType);
+                var propertyType = property.Type;
+                var propertySerializer = SerializerProvider.GetEdmTypeSerializer(propertyType);
                 if (propertySerializer == null)
                 {
                     throw Error.NotSupported(SRResources.TypeCannotBeSerialized, propertyType.FullName(), typeof(ODataOutputFormatter).Name);
@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     if (propertyType != null && propertyType.IsComplex())
                     {
-                        IEdmTypeReference actualType = writeContext.GetEdmType(propertyValue, propertyValue.GetType());
+                        var actualType = writeContext.GetEdmType(propertyValue, propertyValue.GetType());
                         if (actualType != null && propertyType != actualType)
                         {
                             propertyType = actualType;
@@ -120,7 +120,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // Try to add the dynamic properties if the complex type is open.
             if (complexType.ComplexDefinition().IsOpen)
             {
-                List<ODataProperty> dynamicProperties = 
+                var dynamicProperties = 
                     AppendDynamicProperties(complexObject, complexType, writeContext, propertyCollection, new string[0]);
 
                 if (dynamicProperties != null)
@@ -129,9 +129,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            string typeName = complexType.FullName();
+            var typeName = complexType.FullName();
 
-            ODataComplexValue value = new ODataComplexValue()
+            var value = new ODataComplexValue()
             {
                 Properties = propertyCollection,
                 TypeName = typeName

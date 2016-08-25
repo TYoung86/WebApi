@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
                 throw Error.ArgumentNull("edmProperty");
             }
 
-            NavigationPropertyConfiguration navigationProperty = edmProperty as NavigationPropertyConfiguration;
+            var navigationProperty = edmProperty as NavigationPropertyConfiguration;
             if (navigationProperty != null)
             {
                 Apply(navigationProperty, structuralTypeConfiguration, model);
@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
                 throw Error.ArgumentNull("model");
             }
 
-            EntityTypeConfiguration principalEntityType = model.StructuralTypes.OfType<EntityTypeConfiguration>()
+            var principalEntityType = model.StructuralTypes.OfType<EntityTypeConfiguration>()
                 .FirstOrDefault(e => e.ClrType == edmProperty.RelatedClrType);
             if (principalEntityType == null)
             {
@@ -65,18 +65,18 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
                 return;
             }
 
-            EntityTypeConfiguration dependentEntityType = structuralTypeConfiguration as EntityTypeConfiguration;
+            var dependentEntityType = structuralTypeConfiguration as EntityTypeConfiguration;
             if (dependentEntityType == null)
             {
                 return;
             }
 
-            IDictionary<PrimitivePropertyConfiguration, PrimitivePropertyConfiguration> typeNameForeignKeys =
+            var typeNameForeignKeys =
                 GetForeignKeys(principalEntityType, dependentEntityType);
 
             if (typeNameForeignKeys.Any() && typeNameForeignKeys.Count() == principalEntityType.Keys.Count())
             {
-                foreach (KeyValuePair<PrimitivePropertyConfiguration, PrimitivePropertyConfiguration> foreignKey
+                foreach (var foreignKey
                     in typeNameForeignKeys)
                 {
                     edmProperty.HasConstraint(foreignKey.Key.PropertyInfo, foreignKey.Value.PropertyInfo);
@@ -91,12 +91,12 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
             IDictionary<PrimitivePropertyConfiguration, PrimitivePropertyConfiguration> typeNameForeignKeys =
                 new Dictionary<PrimitivePropertyConfiguration, PrimitivePropertyConfiguration>();
 
-            foreach (PrimitivePropertyConfiguration principalKey in principalEntityType.Keys)
+            foreach (var principalKey in principalEntityType.Keys)
             {
-                foreach (PrimitivePropertyConfiguration dependentProperty in
+                foreach (var dependentProperty in
                     dependentEntityType.Properties.OfType<PrimitivePropertyConfiguration>())
                 {
-                    Type dependentType = Nullable.GetUnderlyingType(dependentProperty.PropertyInfo.PropertyType) ??
+                    var dependentType = Nullable.GetUnderlyingType(dependentProperty.PropertyInfo.PropertyType) ??
                                          dependentProperty.PropertyInfo.PropertyType;
                     if (dependentType == principalKey.PropertyInfo.PropertyType)
                     {

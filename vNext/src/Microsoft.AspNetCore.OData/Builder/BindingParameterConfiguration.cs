@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         public BindingParameterConfiguration(string name, IEdmTypeConfiguration parameterType)
             : base(name, parameterType)
         {
-            EdmTypeKind kind = parameterType.Kind;
+            var kind = parameterType.Kind;
             if (kind == EdmTypeKind.Collection)
             {
                 kind = (parameterType as CollectionTypeConfiguration).ElementType.Kind;

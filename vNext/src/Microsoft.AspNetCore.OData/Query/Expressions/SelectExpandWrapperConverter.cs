@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            ISelectExpandWrapper selectExpandWrapper = value as ISelectExpandWrapper;
+            var selectExpandWrapper = value as ISelectExpandWrapper;
             if (selectExpandWrapper != null)
             {
                 serializer.Serialize(writer, selectExpandWrapper.ToDictionary(_mapperProvider));
@@ -58,9 +58,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             public string MapProperty(string propertyName)
             {
-                IEdmProperty property = _type.Properties().Single(s => s.Name == propertyName);
-                PropertyInfo info = GetPropertyInfo(property);
-                JsonPropertyAttribute jsonProperty = GetJsonProperty(info);
+                var property = _type.Properties().Single(s => s.Name == propertyName);
+                var info = GetPropertyInfo(property);
+                var jsonProperty = GetJsonProperty(info);
                 if (jsonProperty != null && !String.IsNullOrWhiteSpace(jsonProperty.PropertyName))
                 {
                     return jsonProperty.PropertyName;
@@ -73,16 +73,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             private PropertyInfo GetPropertyInfo(IEdmProperty property)
             {
-                ClrPropertyInfoAnnotation clrPropertyAnnotation = _model.GetAnnotationValue<ClrPropertyInfoAnnotation>(property);
+                var clrPropertyAnnotation = _model.GetAnnotationValue<ClrPropertyInfoAnnotation>(property);
                 if (clrPropertyAnnotation != null)
                 {
                     return clrPropertyAnnotation.ClrPropertyInfo;
                 }
 
-                ClrTypeAnnotation clrTypeAnnotation = _model.GetAnnotationValue<ClrTypeAnnotation>(property.DeclaringType);
+                var clrTypeAnnotation = _model.GetAnnotationValue<ClrTypeAnnotation>(property.DeclaringType);
                 Contract.Assert(clrTypeAnnotation != null);
 
-                PropertyInfo info = clrTypeAnnotation.ClrType.GetProperty(property.Name);
+                var info = clrTypeAnnotation.ClrType.GetProperty(property.Name);
                 Contract.Assert(info != null);
 
                 return info;

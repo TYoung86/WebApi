@@ -22,9 +22,9 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
         {
             foreach (EntityTypeConfiguration entity in model.ThisAndBaseAndDerivedTypes(configuration.EntityType))
             {
-                foreach (NavigationPropertyConfiguration navigationProperty in entity.NavigationProperties)
+                foreach (var navigationProperty in entity.NavigationProperties)
                 {
-                    NavigationSourceConfiguration targetNavigationSource = GetTargetNavigationSource(navigationProperty, model);
+                    var targetNavigationSource = GetTargetNavigationSource(navigationProperty, model);
                     if (targetNavigationSource != null)
                     {
                         configuration.AddBinding(navigationProperty, targetNavigationSource);
@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
         internal static NavigationSourceConfiguration GetTargetNavigationSource(NavigationPropertyConfiguration navigationProperty,
             ODataModelBuilder model)
         {
-            EntityTypeConfiguration targetEntityType =
+            var targetEntityType =
                 model
                 .StructuralTypes
                 .OfType<EntityTypeConfiguration>()
@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
                     navigationProperty.PropertyInfo.DeclaringType.FullName);
             }
 
-            bool hasSingletonAttribute = navigationProperty.PropertyInfo.GetCustomAttributes<SingletonAttribute>().Any();
+            var hasSingletonAttribute = navigationProperty.PropertyInfo.GetCustomAttributes<SingletonAttribute>().Any();
 
             return GetDefaultNavigationSource(targetEntityType, model, hasSingletonAttribute);
         }

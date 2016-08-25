@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         public Dictionary<string, object> ToDictionary(IPropertyMapper propertyMapper, bool includeAutoSelected = true)
         {
             Contract.Assert(propertyMapper != null);
-            Dictionary<string, object> result = new Dictionary<string, object>();
+            var result = new Dictionary<string, object>();
             ToDictionaryCore(result, propertyMapper, includeAutoSelected);
             return result;
         }
@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Expression container = null;
 
             // build the linked list of properties.
-            foreach (NamedPropertyExpression property in properties)
+            foreach (var property in properties)
             {
                 container = CreateNamedPropertyCreationExpression(property, container);
             }
@@ -80,8 +80,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(property != null);
             Contract.Assert(property.Value != null);
 
-            Type namedPropertyType = GetNamedPropertyType(property, next);
-            List<MemberBinding> memberBindings = new List<MemberBinding>();
+            var namedPropertyType = GetNamedPropertyType(property, next);
+            var memberBindings = new List<MemberBinding>();
 
             memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty("Name"), property.Name));
 
@@ -150,7 +150,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
             }
 
-            Type elementType = property.PageSize == null ? property.Value.Type : property.Value.Type.GetInnerElementType();
+            var elementType = property.PageSize == null ? property.Value.Type : property.Value.Type.GetInnerElementType();
             return namedPropertyGenericType.MakeGenericType(elementType);
         }
 
@@ -169,7 +169,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 if (Name != null && (includeAutoSelected || !AutoSelected))
                 {
-                    string mappedName = propertyMapper.MapProperty(Name);
+                    var mappedName = propertyMapper.MapProperty(Name);
                     if (String.IsNullOrEmpty(mappedName))
                     {
                         throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, Name);

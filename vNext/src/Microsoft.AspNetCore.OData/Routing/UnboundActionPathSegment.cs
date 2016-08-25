@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (Action != null)
             {
-                IEdmTypeReference returnType = Action.Action.ReturnType;
+                var returnType = Action.Action.ReturnType;
                 if (returnType != null)
                 {
                     return returnType.Definition;
@@ -123,7 +123,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.UnboundAction)
             {
-                UnboundActionPathSegment actionSegment = (UnboundActionPathSegment)pathSegment;
+                var actionSegment = (UnboundActionPathSegment)pathSegment;
                 return actionSegment.Action == Action && actionSegment.ActionName == ActionName;
             }
 

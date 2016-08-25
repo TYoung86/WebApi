@@ -93,12 +93,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(writeContext != null);
             Contract.Assert(writeContext.Model != null);
 
-            PropertyInfo dynamicPropertyInfo = EdmLibHelpers.GetDynamicPropertyDictionary(
+            var dynamicPropertyInfo = EdmLibHelpers.GetDynamicPropertyDictionary(
                 structuredType.StructuredDefinition(), writeContext.Model);
 
-            IEdmStructuredObject structuredObject = source as IEdmStructuredObject;
+            var structuredObject = source as IEdmStructuredObject;
             object value;
-            IDelta delta = source as IDelta;
+            var delta = source as IDelta;
             if (delta == null)
             { 
                 if (dynamicPropertyInfo == null || structuredObject == null ||
@@ -112,16 +112,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 value = ((EdmStructuredObject)structuredObject).TryGetDynamicProperties();
             }
 
-            IDictionary<string, object> dynamicPropertyDictionary = (IDictionary<string, object>)value;
+            var dynamicPropertyDictionary = (IDictionary<string, object>)value;
 
             // Build a HashSet to store the declared property names.
             // It is used to make sure the dynamic property name is different from all declared property names.
-            HashSet<string> declaredPropertyNameSet = new HashSet<string>(declaredProperties.Select(p => p.Name));
-            List<ODataProperty> dynamicProperties = new List<ODataProperty>();
-            IEnumerable<KeyValuePair<string, object>> dynamicPropertiesToSelect =
+            var declaredPropertyNameSet = new HashSet<string>(declaredProperties.Select(p => p.Name));
+            var dynamicProperties = new List<ODataProperty>();
+            var dynamicPropertiesToSelect =
                 dynamicPropertyDictionary.Where(
                     x => !selectedDynamicProperties.Any() || selectedDynamicProperties.Contains(x.Key));
-            foreach (KeyValuePair<string, object> dynamicProperty in dynamicPropertiesToSelect)
+            foreach (var dynamicProperty in dynamicPropertiesToSelect)
             {
                 if (String.IsNullOrEmpty(dynamicProperty.Key) || dynamicProperty.Value == null)
                 {
@@ -134,7 +134,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         dynamicProperty.Key, structuredType.FullName());
                 }
 
-                IEdmTypeReference edmTypeReference = writeContext.GetEdmType(dynamicProperty.Value,
+                var edmTypeReference = writeContext.GetEdmType(dynamicProperty.Value,
                     dynamicProperty.Value.GetType());
                 if (edmTypeReference == null)
                 {
@@ -142,7 +142,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         dynamicProperty.Value.GetType().FullName, dynamicProperty.Key);
                 }
 
-                ODataEdmTypeSerializer propertySerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
+                var propertySerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
                 if (propertySerializer == null)
                 {
                     throw Error.NotSupported(SRResources.DynamicPropertyCannotBeSerialized, dynamicProperty.Key,

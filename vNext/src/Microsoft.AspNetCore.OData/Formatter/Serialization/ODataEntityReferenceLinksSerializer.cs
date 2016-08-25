@@ -39,10 +39,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (graph != null)
             {
-                ODataEntityReferenceLinks entityReferenceLinks = graph as ODataEntityReferenceLinks;
+                var entityReferenceLinks = graph as ODataEntityReferenceLinks;
                 if (entityReferenceLinks == null)
                 {
-                    IEnumerable<Uri> uris = graph as IEnumerable<Uri>;
+                    var uris = graph as IEnumerable<Uri>;
                     if (uris == null)
                     {
                         throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));

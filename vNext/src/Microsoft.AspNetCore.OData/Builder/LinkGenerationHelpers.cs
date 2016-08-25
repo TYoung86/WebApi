@@ -37,15 +37,15 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.Argument("entityContext", SRResources.UrlHelperNull, typeof(EntityInstanceContext).Name);
             }
 
-            IList<ODataPathSegment> idLinkPathSegments = entityContext.GenerateBaseODataPathSegments();
+            var idLinkPathSegments = entityContext.GenerateBaseODataPathSegments();
 
-            bool isSameType = entityContext.EntityType == entityContext.NavigationSource.EntityType();
+            var isSameType = entityContext.EntityType == entityContext.NavigationSource.EntityType();
             if (includeCast && !isSameType)
             {
                 idLinkPathSegments.Add(new CastPathSegment(entityContext.EntityType));
             }
 
-            string idLink = entityContext.Url.CreateODataLink(idLinkPathSegments);
+            var idLink = entityContext.Url.CreateODataLink(idLinkPathSegments);
             if (idLink == null)
             {
                 return null;
@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             navigationPathSegments.Add(new NavigationPathSegment(navigationProperty));
 
-            string link = entityContext.Url.CreateODataLink(navigationPathSegments);
+            var link = entityContext.Url.CreateODataLink(navigationPathSegments);
             if (link == null)
             {
                 return null;
@@ -109,7 +109,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("action");
             }
 
-            IEdmOperationParameter bindingParameter = action.Parameters.FirstOrDefault();
+            var bindingParameter = action.Parameters.FirstOrDefault();
             if (bindingParameter == null || !bindingParameter.Type.IsEntity())
             {
                 throw Error.Argument("action", SRResources.ActionNotBoundToEntity, action.Name);
@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             actionPathSegments.Add(new BoundActionPathSegment(actionName));
 
-            string actionLink = entityContext.Url.CreateODataLink(actionPathSegments);
+            var actionLink = entityContext.Url.CreateODataLink(actionPathSegments);
             return actionLink == null ? null : new Uri(actionLink);
         }
 
@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("function");
             }
 
-            IEdmOperationParameter bindingParameter = function.Parameters.FirstOrDefault();
+            var bindingParameter = function.Parameters.FirstOrDefault();
             if (bindingParameter == null || !bindingParameter.Type.IsEntity())
             {
                 throw Error.Argument("function", SRResources.FunctionNotBoundToEntity, function.Name);
@@ -177,15 +177,15 @@ namespace Microsoft.AspNetCore.OData.Builder
                 functionPathSegments.Add(new CastPathSegment(bindingParameterType));
             }
 
-            Dictionary<string, string> parametersDictionary = new Dictionary<string, string>();
-            foreach (string param in parameterNames)
+            var parametersDictionary = new Dictionary<string, string>();
+            foreach (var param in parameterNames)
             {
                 parametersDictionary.Add(param, "@" + param);
             }
 
             functionPathSegments.Add(new BoundFunctionPathSegment(functionName, parametersDictionary));
 
-            string functionLink = entityContext.Url.CreateODataLink(functionPathSegments);
+            var functionLink = entityContext.Url.CreateODataLink(functionPathSegments);
             return functionLink == null ? null : new Uri(functionLink);
         }
 

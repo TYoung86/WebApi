@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.Key)
             {
-                KeyValuePathSegment keySegment = (KeyValuePathSegment)pathSegment;
+                var keySegment = (KeyValuePathSegment)pathSegment;
                 return TryMatch(ParameterMappings, keySegment.Values, values, null);
             }
 
@@ -62,11 +62,11 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             enumNames = enumNames ?? new string[] { };
-            Dictionary<string, string> routeData = new Dictionary<string, string>();
-            foreach (KeyValuePair<string, string> parameter in parameterMappings)
+            var routeData = new Dictionary<string, string>();
+            foreach (var parameter in parameterMappings)
             {
-                string nameInSegment = parameter.Key;
-                string nameInRouteData = parameter.Value;
+                var nameInSegment = parameter.Key;
+                var nameInRouteData = parameter.Value;
 
                 string value;
                 if (!parameterValues.TryGetValue(nameInSegment, out value))
@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Routing
 
                 if (enumNames.Contains(nameInSegment))
                 {
-                    string[] enumParts = value.Split(new[] { '\'' }, StringSplitOptions.None);
+                    var enumParts = value.Split(new[] { '\'' }, StringSplitOptions.None);
 
                     if (enumParts.Length == 3 && String.IsNullOrEmpty(enumParts[2]))
                     {
@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 routeData.Add(nameInRouteData, value);
             }
 
-            foreach (KeyValuePair<string, string> kvp in routeData)
+            foreach (var kvp in routeData)
             {
                 matches[kvp.Key] = kvp.Value;
             }
@@ -100,12 +100,12 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             Contract.Assert(parameters != null);
 
-            Dictionary<string, string> parameterMappings = new Dictionary<string, string>();
+            var parameterMappings = new Dictionary<string, string>();
 
-            foreach (KeyValuePair<string, string> parameter in parameters)
+            foreach (var parameter in parameters)
             {
-                string parameterName = parameter.Key;
-                string parameterNameInRouteData = parameter.Value;
+                var parameterName = parameter.Key;
+                var parameterNameInRouteData = parameter.Value;
                 parameterNameInRouteData = parameterNameInRouteData.Trim();
 
                 if (String.IsNullOrEmpty(parameterNameInRouteData))

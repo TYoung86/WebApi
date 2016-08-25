@@ -13,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions
     {
         public void Apply(IEdmTypeConfiguration edmTypeConfiguration, ODataConventionModelBuilder model)
         {
-            StructuralTypeConfiguration structuralType = edmTypeConfiguration as StructuralTypeConfiguration;
+            var structuralType = edmTypeConfiguration as StructuralTypeConfiguration;
             if (structuralType != null && structuralType.IsAbstract == null)
             {
                 structuralType.IsAbstract = structuralType.ClrType.GetTypeInfo().IsAbstract;

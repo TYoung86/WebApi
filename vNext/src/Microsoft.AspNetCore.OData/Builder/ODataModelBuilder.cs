@@ -170,7 +170,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         /// <returns>The configuration object for the specified entity set.</returns>
         public EntitySetConfiguration<TEntityType> EntitySet<TEntityType>(string name) where TEntityType : class
         {
-            EntityTypeConfiguration entity = AddEntityType(typeof(TEntityType));
+            var entity = AddEntityType(typeof(TEntityType));
             return new EntitySetConfiguration<TEntityType>(this, AddEntitySet(name, entity));
         }
 
@@ -193,7 +193,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         /// <returns>The configuration object for the specified singleton.</returns>
         public SingletonConfiguration<TEntityType> Singleton<TEntityType>(string name) where TEntityType : class
         {
-            EntityTypeConfiguration entity = AddEntityType(typeof(TEntityType));
+            var entity = AddEntityType(typeof(TEntityType));
             return new SingletonConfiguration<TEntityType>(this, AddSingleton(name, entity));
         }
 
@@ -204,7 +204,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         /// <returns>The configuration object for the specified action.</returns>
         public virtual ActionConfiguration Action(string name)
         {
-            ActionConfiguration action = new ActionConfiguration(this, name);
+            var action = new ActionConfiguration(this, name);
             _procedures.Add(action);
             return action;
         }
@@ -217,7 +217,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Consistent with term in EdmLib.")]
         public virtual FunctionConfiguration Function(string name)
         {
-            FunctionConfiguration function = new FunctionConfiguration(this, name);
+            var function = new FunctionConfiguration(this, name);
             _procedures.Add(function);
             return function;
         }
@@ -237,13 +237,13 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (!_structuralTypes.ContainsKey(type))
             {
-                EntityTypeConfiguration entityTypeConfig = new EntityTypeConfiguration(this, type);
+                var entityTypeConfig = new EntityTypeConfiguration(this, type);
                 _structuralTypes.Add(type, entityTypeConfig);
                 return entityTypeConfig;
             }
             else
             {
-                EntityTypeConfiguration config = _structuralTypes[type] as EntityTypeConfiguration;
+                var config = _structuralTypes[type] as EntityTypeConfiguration;
                 if (config == null || config.ClrType != type)
                 {
                     throw Error.Argument("type", SRResources.TypeCannotBeEntityWasComplex, type.FullName);
@@ -268,13 +268,13 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (!_primitiveTypes.ContainsKey(type))
             {
-                PrimitiveTypeConfiguration entityTypeConfig = new PrimitiveTypeConfiguration(this, EdmLibHelpers.GetEdmPrimitiveTypeOrNull(type), type);
+                var entityTypeConfig = new PrimitiveTypeConfiguration(this, EdmLibHelpers.GetEdmPrimitiveTypeOrNull(type), type);
                 _primitiveTypes.Add(type, entityTypeConfig);
                 return entityTypeConfig;
             }
             else
             {
-                PrimitiveTypeConfiguration config = _primitiveTypes[type];
+                var config = _primitiveTypes[type];
                 if (config == null || config.ClrType != type)
                 {
                     throw Error.Argument("type", SRResources.TypeMustBeEntity, type.FullName);
@@ -299,13 +299,13 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (!_structuralTypes.ContainsKey(type))
             {
-                ComplexTypeConfiguration complexTypeConfig = new ComplexTypeConfiguration(this, type);
+                var complexTypeConfig = new ComplexTypeConfiguration(this, type);
                 _structuralTypes.Add(type, complexTypeConfig);
                 return complexTypeConfig;
             }
             else
             {
-                ComplexTypeConfiguration complexTypeConfig = _structuralTypes[type] as ComplexTypeConfiguration;
+                var complexTypeConfig = _structuralTypes[type] as ComplexTypeConfiguration;
                 if (complexTypeConfig == null || complexTypeConfig.ClrType != type)
                 {
                     throw Error.Argument("type", SRResources.TypeCannotBeComplexWasEntity, type.FullName);
@@ -334,13 +334,13 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (!_enumTypes.ContainsKey(type))
             {
-                EnumTypeConfiguration enumTypeConfig = new EnumTypeConfiguration(this, type);
+                var enumTypeConfig = new EnumTypeConfiguration(this, type);
                 _enumTypes.Add(type, enumTypeConfig);
                 return enumTypeConfig;
             }
             else
             {
-                EnumTypeConfiguration enumTypeConfig = _enumTypes[type];
+                var enumTypeConfig = _enumTypes[type];
                 if (enumTypeConfig.ClrType != type)
                 {
                     throw Error.Argument("type", SRResources.TypeCannotBeEnum, type.FullName);
@@ -498,7 +498,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (_navigationSources.ContainsKey(name))
             {
-                EntitySetConfiguration entitySet = _navigationSources[name] as EntitySetConfiguration;
+                var entitySet = _navigationSources[name] as EntitySetConfiguration;
                 if (entitySet != null)
                 {
                     return _navigationSources.Remove(name);
@@ -522,7 +522,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (_navigationSources.ContainsKey(name))
             {
-                SingletonConfiguration singleton = _navigationSources[name] as SingletonConfiguration;
+                var singleton = _navigationSources[name] as SingletonConfiguration;
                 if (singleton != null)
                 {
                     return _navigationSources.Remove(name);
@@ -548,8 +548,8 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("name");
             }
 
-            ProcedureConfiguration[] toRemove = _procedures.Where(p => p.Name == name).ToArray();
-            int count = toRemove.Count();
+            var toRemove = _procedures.Where(p => p.Name == name).ToArray();
+            var count = toRemove.Count();
             if (count == 1)
             {
                 return RemoveProcedure(toRemove[0]);
@@ -592,7 +592,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             }
             else
             {
-                IEdmPrimitiveType edmType = EdmLibHelpers.GetEdmPrimitiveTypeOrNull(type);
+                var edmType = EdmLibHelpers.GetEdmPrimitiveTypeOrNull(type);
                 PrimitiveTypeConfiguration primitiveType = null;
                 if (edmType != null)
                 {
@@ -620,7 +620,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Property is not appropriate, method does work")]
         public virtual IEdmModel GetEdmModel()
         {
-            IEdmModel model = EdmModelHelperMethods.BuildEdmModel(this);
+            var model = EdmModelHelperMethods.BuildEdmModel(this);
             ValidateModel(model);
             return model;
         }
@@ -636,7 +636,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("model");
             }
 
-            foreach (IEdmEntityType entity in model.SchemaElementsAcrossModels().OfType<IEdmEntityType>())
+            foreach (var entity in model.SchemaElementsAcrossModels().OfType<IEdmEntityType>())
             {
                 if (!entity.IsAbstract && !entity.Key().Any() && entity.DeclaredProperties.Any())
                 {
@@ -644,7 +644,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 }
             }
 
-            foreach (IEdmNavigationSource navigationSource in model.EntityContainer.Elements.OfType<IEdmNavigationSource>())
+            foreach (var navigationSource in model.EntityContainer.Elements.OfType<IEdmNavigationSource>())
             {
                 if (!navigationSource.EntityType().Key().Any())
                 {

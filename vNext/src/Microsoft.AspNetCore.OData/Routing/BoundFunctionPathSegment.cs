@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (Function != null)
             {
-                IEdmTypeReference returnType = Function.ReturnType;
+                var returnType = Function.ReturnType;
                 if (returnType != null)
                 {
                     return returnType.Definition;
@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             // Try to use the entity set annotation to get the target navigation source.
-            ReturnedEntitySetAnnotation entitySetAnnotation =
+            var entitySetAnnotation =
                     _edmModel.GetAnnotationValue<ReturnedEntitySetAnnotation>(Function);
 
             if (entitySetAnnotation != null)
@@ -121,8 +121,8 @@ namespace Microsoft.AspNetCore.OData.Routing
                 if (Function.TryGetRelativeEntitySetPath(_edmModel, out parameter, out navigationProperties,
                     out lastEntityType, out errors))
                 {
-                    IEdmNavigationSource targetNavigationSource = previousNavigationSource;
-                    foreach (IEdmNavigationProperty navigationProperty in navigationProperties)
+                    var targetNavigationSource = previousNavigationSource;
+                    foreach (var navigationProperty in navigationProperties)
                     {
                         targetNavigationSource = targetNavigationSource.FindNavigationTarget(navigationProperty);
                         if (targetNavigationSource == null)
@@ -153,13 +153,13 @@ namespace Microsoft.AspNetCore.OData.Routing
             string paramValue;
             if (Values.TryGetValue(parameterName, out paramValue))
             {
-                IEdmOperationParameter edmParam = Function.FindParameter(parameterName);
+                var edmParam = Function.FindParameter(parameterName);
                 if (edmParam != null)
                 {
-                    IEdmTypeReference edmType = edmParam.Type;
+                    var edmType = edmParam.Type;
                     if (edmParam.Type.IsCollection())
                     {
-                        IEdmCollectionTypeReference collectionTypeReference = edmParam.Type.AsCollection();
+                        var collectionTypeReference = edmParam.Type.AsCollection();
                         edmType = collectionTypeReference.ElementType();
                     }
 
@@ -184,7 +184,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// </returns>
         public override string ToString()
         {
-            IEnumerable<string> parameters = Values.Select(v => String.Format(CultureInfo.InvariantCulture, "{0}={1}", v.Key, v.Value));
+            var parameters = Values.Select(v => String.Format(CultureInfo.InvariantCulture, "{0}={1}", v.Key, v.Value));
             return String.Format(CultureInfo.InvariantCulture, "{0}({1})", FunctionName, String.Join(",", parameters));
         }
 
@@ -193,7 +193,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.Function)
             {
-                BoundFunctionPathSegment functionSegment = (BoundFunctionPathSegment)pathSegment;
+                var functionSegment = (BoundFunctionPathSegment)pathSegment;
                 return functionSegment.Function == Function && functionSegment.FunctionName == FunctionName;
             }
 

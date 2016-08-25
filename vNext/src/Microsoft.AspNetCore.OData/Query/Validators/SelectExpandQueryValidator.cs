@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validators
                 throw Error.ArgumentNull("validationSettings");
             }
 
-            IEdmModel model = selectExpandQueryOption.Context.Model;
+            var model = selectExpandQueryOption.Context.Model;
             ValidateRestrictions(selectExpandQueryOption.SelectExpandClause, model);
 
             if (validationSettings.MaxExpansionDepth > 0)
@@ -56,15 +56,15 @@ namespace Microsoft.AspNetCore.OData.Query.Validators
         private static void ValidateDepth(SelectExpandClause selectExpand, int maxDepth)
         {
             // do a DFS to see if there is any node that is too deep.
-            Stack<Tuple<int, SelectExpandClause>> nodesToVisit = new Stack<Tuple<int, SelectExpandClause>>();
+            var nodesToVisit = new Stack<Tuple<int, SelectExpandClause>>();
             nodesToVisit.Push(Tuple.Create(0, selectExpand));
             while (nodesToVisit.Count > 0)
             {
-                Tuple<int, SelectExpandClause> tuple = nodesToVisit.Pop();
-                int currentDepth = tuple.Item1;
-                SelectExpandClause currentNode = tuple.Item2;
+                var tuple = nodesToVisit.Pop();
+                var currentDepth = tuple.Item1;
+                var currentNode = tuple.Item2;
 
-                ExpandedNavigationSelectItem[] expandItems = currentNode.SelectedItems.OfType<ExpandedNavigationSelectItem>().ToArray();
+                var expandItems = currentNode.SelectedItems.OfType<ExpandedNavigationSelectItem>().ToArray();
 
                 if (expandItems.Length > 0 &&
                     ((currentDepth == maxDepth &&
@@ -82,9 +82,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validators
                         Error.Format(SRResources.MaxExpandDepthExceeded, maxDepth, "MaxExpansionDepth"));
                 }
 
-                foreach (ExpandedNavigationSelectItem expandItem in expandItems)
+                foreach (var expandItem in expandItems)
                 {
-                    int depth = currentDepth + 1;
+                    var depth = currentDepth + 1;
 
                     if (expandItem.LevelsOption != null && !expandItem.LevelsOption.IsMaxLevel)
                     {
@@ -99,13 +99,13 @@ namespace Microsoft.AspNetCore.OData.Query.Validators
 
         private static void ValidateRestrictions(SelectExpandClause selectExpandClause, IEdmModel edmModel)
         {
-            foreach (SelectItem selectItem in selectExpandClause.SelectedItems)
+            foreach (var selectItem in selectExpandClause.SelectedItems)
             {
-                ExpandedNavigationSelectItem expandItem = selectItem as ExpandedNavigationSelectItem;
+                var expandItem = selectItem as ExpandedNavigationSelectItem;
                 if (expandItem != null)
                 {
-                    NavigationPropertySegment navigationSegment = (NavigationPropertySegment)expandItem.PathToNavigationProperty.LastSegment;
-                    IEdmNavigationProperty navigationProperty = navigationSegment.NavigationProperty;
+                    var navigationSegment = (NavigationPropertySegment)expandItem.PathToNavigationProperty.LastSegment;
+                    var navigationProperty = navigationSegment.NavigationProperty;
                     if (EdmLibHelpers.IsNotExpandable(navigationProperty, edmModel))
                     {
                         throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand, navigationProperty.Name));
@@ -113,14 +113,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validators
                     ValidateRestrictions(expandItem.SelectAndExpand, edmModel);
                 }
 
-                PathSelectItem pathSelectItem = selectItem as PathSelectItem;
+                var pathSelectItem = selectItem as PathSelectItem;
                 if (pathSelectItem != null)
                 {
-                    ODataPathSegment segment = pathSelectItem.SelectedPath.LastSegment;
-                    NavigationPropertySegment navigationPropertySegment = segment as NavigationPropertySegment;
+                    var segment = pathSelectItem.SelectedPath.LastSegment;
+                    var navigationPropertySegment = segment as NavigationPropertySegment;
                     if (navigationPropertySegment != null)
                     {
-                        IEdmNavigationProperty navigationProperty = navigationPropertySegment.NavigationProperty;
+                        var navigationProperty = navigationPropertySegment.NavigationProperty;
                         if (EdmLibHelpers.IsNotNavigable(navigationProperty, edmModel))
                         {
                             throw new ODataException(Error.Format(SRResources.NotNavigablePropertyUsedInNavigation, navigationProperty.Name));

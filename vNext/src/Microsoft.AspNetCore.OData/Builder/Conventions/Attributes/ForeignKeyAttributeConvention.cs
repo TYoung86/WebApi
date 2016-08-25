@@ -41,13 +41,13 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                 throw Error.ArgumentNull("attribute");
             }
 
-            EntityTypeConfiguration declaringEntityType = structuralTypeConfiguration as EntityTypeConfiguration;
+            var declaringEntityType = structuralTypeConfiguration as EntityTypeConfiguration;
             if (declaringEntityType == null)
             {
                 return;
             }
 
-            ForeignKeyAttribute foreignKeyAttribute = (ForeignKeyAttribute)attribute;
+            var foreignKeyAttribute = (ForeignKeyAttribute)attribute;
             switch (edmProperty.Kind)
             {
                 case PropertyKind.Navigation:
@@ -73,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                 return;
             }
 
-            EntityTypeConfiguration principalEntity = entityType.ModelBuilder.StructuralTypes
+            var principalEntity = entityType.ModelBuilder.StructuralTypes
                     .OfType<EntityTypeConfiguration>().FirstOrDefault(e => e.ClrType == navProperty.RelatedClrType);
             if (principalEntity == null)
             {
@@ -81,22 +81,22 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
             }
 
             // if a navigation property has multiple foreign keys, use comma to separate the list of foreign key names.
-            IEnumerable<string> dependentPropertyNames = foreignKeyAttribute.Name.Split(',').Select(p => p.Trim());
-            foreach (string dependentPropertyName in dependentPropertyNames)
+            var dependentPropertyNames = foreignKeyAttribute.Name.Split(',').Select(p => p.Trim());
+            foreach (var dependentPropertyName in dependentPropertyNames)
             {
                 if (String.IsNullOrWhiteSpace(dependentPropertyName))
                 {
                     continue;
                 }
 
-                PrimitivePropertyConfiguration dependent =
+                var dependent =
                     entityType.Properties.OfType<PrimitivePropertyConfiguration>()
                         .SingleOrDefault(p => p.Name.Equals(dependentPropertyName, StringComparison.Ordinal));
 
                 if (dependent != null)
                 {
-                    Type dependentType = Nullable.GetUnderlyingType(dependent.PropertyInfo.PropertyType) ?? dependent.PropertyInfo.PropertyType;
-                    PrimitivePropertyConfiguration principal = principalEntity.Keys.FirstOrDefault(
+                    var dependentType = Nullable.GetUnderlyingType(dependent.PropertyInfo.PropertyType) ?? dependent.PropertyInfo.PropertyType;
+                    var principal = principalEntity.Keys.FirstOrDefault(
                             k => k.PropertyInfo.PropertyType == dependentType && navProperty.PrincipalProperties.All(p => p != k.PropertyInfo));
 
                     if (principal != null)
@@ -114,8 +114,8 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
             Contract.Assert(entityType != null);
             Contract.Assert(foreignKeyAttribute != null);
 
-            string navName = foreignKeyAttribute.Name.Trim();
-            NavigationPropertyConfiguration navProperty = entityType.NavigationProperties
+            var navName = foreignKeyAttribute.Name.Trim();
+            var navProperty = entityType.NavigationProperties
                 .FirstOrDefault(n => n.Name.Equals(navName, StringComparison.Ordinal));
             if (navProperty == null)
             {
@@ -127,15 +127,15 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                 return;
             }
 
-            EntityTypeConfiguration principalEntity = entityType.ModelBuilder.StructuralTypes
+            var principalEntity = entityType.ModelBuilder.StructuralTypes
                 .OfType<EntityTypeConfiguration>().FirstOrDefault(e => e.ClrType == navProperty.RelatedClrType);
             if (principalEntity == null)
             {
                 return;
             }
 
-            Type dependentType = Nullable.GetUnderlyingType(dependent.PropertyInfo.PropertyType) ?? dependent.PropertyInfo.PropertyType;
-            PrimitivePropertyConfiguration principal = principalEntity.Keys.FirstOrDefault(
+            var dependentType = Nullable.GetUnderlyingType(dependent.PropertyInfo.PropertyType) ?? dependent.PropertyInfo.PropertyType;
+            var principal = principalEntity.Keys.FirstOrDefault(
                 k => k.PropertyInfo.PropertyType == dependentType && navProperty.PrincipalProperties.All(p => p != k.PropertyInfo));
             if (principal != null)
             {

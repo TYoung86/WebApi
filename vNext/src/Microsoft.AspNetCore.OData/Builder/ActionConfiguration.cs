@@ -122,9 +122,9 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("entitySetConfiguration");
             }
 
-            Type clrCollectionType = typeof(IEnumerable<TElementEntityType>);
+            var clrCollectionType = typeof(IEnumerable<TElementEntityType>);
             NavigationSource = entitySetConfiguration.EntitySet;
-            IEdmTypeConfiguration elementType = ModelBuilder.GetTypeConfigurationOrNull(typeof(TElementEntityType));
+            var elementType = ModelBuilder.GetTypeConfigurationOrNull(typeof(TElementEntityType));
             ReturnType = new CollectionTypeConfiguration(elementType, clrCollectionType);
             return this;
         }
@@ -136,8 +136,8 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "In keeping with rest of API")]
         public ActionConfiguration Returns<TReturnType>()
         {
-            Type returnType = typeof(TReturnType);
-            IEdmTypeConfiguration configuration = ModelBuilder.GetTypeConfigurationOrNull(returnType);
+            var returnType = typeof(TReturnType);
+            var configuration = ModelBuilder.GetTypeConfigurationOrNull(returnType);
 
             if (configuration is EntityTypeConfiguration)
             {
@@ -155,8 +155,8 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "In keeping with rest of API")]
         public ActionConfiguration ReturnsCollection<TReturnElementType>()
         {
-            Type clrElementType = typeof(TReturnElementType);
-            IEdmTypeConfiguration edmElementType = ModelBuilder.GetTypeConfigurationOrNull(clrElementType);
+            var clrElementType = typeof(TReturnElementType);
+            var edmElementType = ModelBuilder.GetTypeConfigurationOrNull(clrElementType);
 
             if (edmElementType is EntityTypeConfiguration)
             {

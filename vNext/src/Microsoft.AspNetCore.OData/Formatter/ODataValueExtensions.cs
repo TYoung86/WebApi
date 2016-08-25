@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return null;
             }
 
-            ODataPrimitiveValue oDataPrimitiveValue = odataValue as ODataPrimitiveValue;
+            var oDataPrimitiveValue = odataValue as ODataPrimitiveValue;
             if (oDataPrimitiveValue != null)
             {
                 return oDataPrimitiveValue.Value;

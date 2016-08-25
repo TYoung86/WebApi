@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull("action");
             }
 
-            ActionLinkBuilder actionLinkBuilder = model.GetAnnotationValue<ActionLinkBuilder>(action);
+            var actionLinkBuilder = model.GetAnnotationValue<ActionLinkBuilder>(action);
             if (actionLinkBuilder == null)
             {
                 actionLinkBuilder = new ActionLinkBuilder(
@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 throw Error.ArgumentNull("model");
             }
 
-            NavigationSourceLinkBuilderAnnotation annotation = model
+            var annotation = model
                 .GetAnnotationValue<NavigationSourceLinkBuilderAnnotation>(navigationSource);
             if (annotation == null)
             {
@@ -143,7 +143,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             Contract.Assert(model != null);
 
-            ClrTypeCache typeMappingCache = model.GetAnnotationValue<ClrTypeCache>(model);
+            var typeMappingCache = model.GetAnnotationValue<ClrTypeCache>(model);
             if (typeMappingCache == null)
             {
                 typeMappingCache = new ClrTypeCache();

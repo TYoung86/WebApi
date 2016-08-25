@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return false;
             }
 
-            for (int i = 0; i < left.Length; i++)
+            for (var i = 0; i < left.Length; i++)
             {
                 if (left[i] != right[i])
                 {

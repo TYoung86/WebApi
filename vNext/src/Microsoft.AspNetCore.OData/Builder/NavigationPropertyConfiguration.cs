@@ -219,12 +219,12 @@ namespace Microsoft.AspNetCore.OData.Builder
                 return this;
             }
 
-            EntityTypeConfiguration principalEntity = DeclaringEntityType.ModelBuilder.StructuralTypes
+            var principalEntity = DeclaringEntityType.ModelBuilder.StructuralTypes
                     .OfType<EntityTypeConfiguration>().FirstOrDefault(e => e.ClrType == RelatedClrType);
             Contract.Assert(principalEntity != null);
 
-            PrimitivePropertyConfiguration principal = principalEntity.AddProperty(constraint.Value);
-            PrimitivePropertyConfiguration dependent = DeclaringEntityType.AddProperty(constraint.Key);
+            var principal = principalEntity.AddProperty(constraint.Value);
+            var dependent = DeclaringEntityType.AddProperty(constraint.Key);
 
             // If the navigation property on which the referential constraint is defined or the principal property
             // is nullable, then the dependent property MUST be nullable.
@@ -260,14 +260,14 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             if (PrincipalProperties.Any(p => p == constraint.Value))
             {
-                PropertyInfo foundDependent = _referentialConstraint.First(r => r.Value == constraint.Value).Key;
+                var foundDependent = _referentialConstraint.First(r => r.Value == constraint.Value).Key;
 
                 throw Error.InvalidOperation(SRResources.ReferentialConstraintAlreadyConfigured, "principal",
                     constraint.Value.Name, "dependent", foundDependent.Name);
             }
 
-            Type dependentType = Nullable.GetUnderlyingType(constraint.Key.PropertyType) ?? constraint.Key.PropertyType;
-            Type principalType = Nullable.GetUnderlyingType(constraint.Value.PropertyType) ?? constraint.Value.PropertyType;
+            var dependentType = Nullable.GetUnderlyingType(constraint.Key.PropertyType) ?? constraint.Key.PropertyType;
+            var principalType = Nullable.GetUnderlyingType(constraint.Value.PropertyType) ?? constraint.Value.PropertyType;
 
             // The principal property and the dependent property must have the same data type.
             if (dependentType != principalType)

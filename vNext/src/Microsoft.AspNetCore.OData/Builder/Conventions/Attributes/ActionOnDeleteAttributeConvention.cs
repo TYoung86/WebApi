@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                 throw Error.ArgumentNull("edmProperty");
             }
 
-            ActionOnDeleteAttribute actionOnDelete = attribute as ActionOnDeleteAttribute;
+            var actionOnDelete = attribute as ActionOnDeleteAttribute;
             if (actionOnDelete != null && !edmProperty.AddedExplicitly && edmProperty.DependentProperties.Any())
             {
                 edmProperty.OnDeleteAction = actionOnDelete.OnDeleteAction;

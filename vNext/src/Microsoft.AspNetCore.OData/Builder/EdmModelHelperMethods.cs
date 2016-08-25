@@ -26,8 +26,8 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("builder");
             }
 
-            EdmModel model = new EdmModel();
-            EdmEntityContainer container = new EdmEntityContainer(builder.Namespace, builder.ContainerName);
+            var model = new EdmModel();
+            var container = new EdmEntityContainer(builder.Namespace, builder.ContainerName);
 
             // add types and sets, building an index on the way.
             Dictionary<Type, IEdmType> edmTypeMap = model.AddTypes(builder.StructuralTypes, builder.EnumTypes);
@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             NavigationSourceAndAnnotations[] singletons = container.AddSingletonAndAnnotations(builder, edmTypeMap);
 
             // Merge EntitySets and Singletons together
-            IEnumerable<NavigationSourceAndAnnotations> navigationSources = entitySets.Concat(singletons);
+            var navigationSources = entitySets.Concat(singletons);
 
             // Build the navigation source map
             IDictionary<string, EdmNavigationSource> navigationSourceMap = model.GetNavigationSourceMap(builder, edmTypeMap, navigationSources);
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             Contract.Assert(model != null);
             Contract.Assert(types != null);
 
-            foreach (IEdmType type in types.Values)
+            foreach (var type in types.Values)
             {
                 model.AddType(type);
             }
@@ -70,10 +70,10 @@ namespace Microsoft.AspNetCore.OData.Builder
         private static NavigationSourceAndAnnotations[] AddEntitySetAndAnnotations(this EdmEntityContainer container,
             ODataModelBuilder builder, Dictionary<Type, IEdmType> edmTypeMap)
         {
-            IEnumerable<EntitySetConfiguration> configurations = builder.EntitySets;
+            var configurations = builder.EntitySets;
 
             // build the entitysets
-            IEnumerable<Tuple<EdmEntitySet, EntitySetConfiguration>> entitySets = AddEntitySets(configurations, container, edmTypeMap);
+            var entitySets = AddEntitySets(configurations, container, edmTypeMap);
 
             // return the annotation array
             return entitySets.Select(e => new NavigationSourceAndAnnotations()
@@ -88,10 +88,10 @@ namespace Microsoft.AspNetCore.OData.Builder
         private static NavigationSourceAndAnnotations[] AddSingletonAndAnnotations(this EdmEntityContainer container,
             ODataModelBuilder builder, Dictionary<Type, IEdmType> edmTypeMap)
         {
-            IEnumerable<SingletonConfiguration> configurations = builder.Singletons;
+            var configurations = builder.Singletons;
 
             // build the singletons
-            IEnumerable<Tuple<EdmSingleton, SingletonConfiguration>> singletons = AddSingletons(configurations, container, edmTypeMap);
+            var singletons = AddSingletons(configurations, container, edmTypeMap);
 
             // return the annotation array
             return singletons.Select(e => new NavigationSourceAndAnnotations()
@@ -107,12 +107,12 @@ namespace Microsoft.AspNetCore.OData.Builder
             Dictionary<Type, IEdmType> edmTypeMap, IEnumerable<NavigationSourceAndAnnotations> navigationSourceAndAnnotations)
         {
             // index the navigation source by name
-            Dictionary<string, EdmNavigationSource> edmNavigationSourceMap = navigationSourceAndAnnotations.ToDictionary(e => e.NavigationSource.Name, e => e.NavigationSource);
+            var edmNavigationSourceMap = navigationSourceAndAnnotations.ToDictionary(e => e.NavigationSource.Name, e => e.NavigationSource);
 
             // apply the annotations
-            foreach (NavigationSourceAndAnnotations navigationSourceAndAnnotation in navigationSourceAndAnnotations)
+            foreach (var navigationSourceAndAnnotation in navigationSourceAndAnnotations)
             {
-                EdmNavigationSource navigationSource = navigationSourceAndAnnotation.NavigationSource;
+                var navigationSource = navigationSourceAndAnnotation.NavigationSource;
                 model.SetAnnotationValue<NavigationSourceUrlAnnotation>(navigationSource, navigationSourceAndAnnotation.Url);
                 model.SetNavigationSourceLinkBuilder(navigationSource, navigationSourceAndAnnotation.LinkBuilder);
 
@@ -132,14 +132,14 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             foreach (EntityTypeConfiguration entityType in builder.ThisAndBaseAndDerivedTypes(configuration.EntityType))
             {
-                foreach (NavigationPropertyConfiguration navigationProperty in entityType.NavigationProperties)
+                foreach (var navigationProperty in entityType.NavigationProperties)
                 {
-                    NavigationPropertyBindingConfiguration binding = configuration.FindBinding(navigationProperty);
-                    bool isContained = navigationProperty.ContainsTarget;
+                    var binding = configuration.FindBinding(navigationProperty);
+                    var isContained = navigationProperty.ContainsTarget;
                     if (binding != null || isContained)
                     {
-                        EdmEntityType edmEntityType = edmTypeMap[entityType.ClrType] as EdmEntityType;
-                        IEdmNavigationProperty edmNavigationProperty = edmEntityType.NavigationProperties()
+                        var edmEntityType = edmTypeMap[entityType.ClrType] as EdmEntityType;
+                        var edmNavigationProperty = edmEntityType.NavigationProperties()
                             .Single(np => np.Name == navigationProperty.Name);
 
                         if (!isContained)
@@ -149,7 +149,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                                 edmNavigationSourceMap[binding.TargetNavigationSource.Name]);
                         }
 
-                        NavigationLinkBuilder linkBuilderFunc = configuration.GetNavigationPropertyLink(navigationProperty);
+                        var linkBuilderFunc = configuration.GetNavigationPropertyLink(navigationProperty);
                         if (linkBuilderFunc != null)
                         {
                             linkBuilder.AddNavigationPropertyLinkBuilder(edmNavigationProperty, linkBuilderFunc);
@@ -161,10 +161,10 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private static void AddProcedureParameters(EdmOperation operation, ProcedureConfiguration procedure, Dictionary<Type, IEdmType> edmTypeMap)
         {
-            foreach (ParameterConfiguration parameter in procedure.Parameters)
+            foreach (var parameter in procedure.Parameters)
             {
-                bool isParameterOptional = parameter.OptionalParameter;
-                IEdmTypeReference parameterTypeReference = GetEdmTypeReference(edmTypeMap, parameter.TypeConfiguration, nullable: isParameterOptional);
+                var isParameterOptional = parameter.OptionalParameter;
+                var parameterTypeReference = GetEdmTypeReference(edmTypeMap, parameter.TypeConfiguration, nullable: isParameterOptional);
                 IEdmOperationParameter operationParameter = new EdmOperationParameter(operation, parameter.Name, parameterTypeReference);
                 operation.AddParameter(operationParameter);
             }
@@ -174,10 +174,10 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             if (procedure.BindingParameter.TypeConfiguration.Kind == EdmTypeKind.Entity)
             {
-                ActionConfiguration actionConfiguration = procedure as ActionConfiguration;
-                IEdmAction action = operation as IEdmAction;
-                FunctionConfiguration functionConfiguration = procedure as FunctionConfiguration;
-                IEdmFunction function = operation as IEdmFunction;
+                var actionConfiguration = procedure as ActionConfiguration;
+                var action = operation as IEdmAction;
+                var functionConfiguration = procedure as FunctionConfiguration;
+                var function = operation as IEdmFunction;
                 if (actionConfiguration != null && actionConfiguration.GetActionLink() != null && action != null)
                 {
                     model.SetActionLinkBuilder(
@@ -213,12 +213,12 @@ namespace Microsoft.AspNetCore.OData.Builder
 
             ValidateActionOverload(configurations.OfType<ActionConfiguration>());
 
-            foreach (ProcedureConfiguration procedure in configurations)
+            foreach (var procedure in configurations)
             {
-                IEdmTypeReference returnReference = GetEdmTypeReference(edmTypeMap,
+                var returnReference = GetEdmTypeReference(edmTypeMap,
                     procedure.ReturnType,
                     procedure.ReturnType != null && procedure.OptionalReturn);
-                IEdmExpression expression = GetEdmEntitySetExpression(edmNavigationSourceMap, procedure);
+                var expression = GetEdmEntitySetExpression(edmNavigationSourceMap, procedure);
                 IEdmPathExpression pathExpression = procedure.EntitySetPath != null
                     ? new EdmPathExpression(procedure.EntitySetPath)
                     : null;
@@ -241,7 +241,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                         return;
                 }
 
-                EdmOperation operation = (EdmOperation)operationImport.Operation;
+                var operation = (EdmOperation)operationImport.Operation;
                 if (procedure.IsBindable && procedure.Title != null & procedure.Title != procedure.Name)
                 {
                     model.SetOperationTitleAnnotation(operation, new OperationTitleAnnotation(procedure.Title));
@@ -277,7 +277,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             IEdmExpression expression,
             IEdmPathExpression pathExpression)
         {
-            EdmAction operation = new EdmAction(
+            var operation = new EdmAction(
                 container.Namespace,
                 procedure.Name,
                 returnReference,
@@ -293,7 +293,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             IEdmExpression expression,
             IEdmPathExpression pathExpression)
         {
-            EdmFunction operation = new EdmFunction(
+            var operation = new EdmFunction(
                     container.Namespace,
                     function.Name,
                     returnReference,
@@ -312,11 +312,11 @@ namespace Microsoft.AspNetCore.OData.Builder
         private static void ValidateActionOverload(IEnumerable<ActionConfiguration> configurations)
         {
             // 1. validate at most one unbound overload
-            ActionConfiguration[] unboundActions = configurations.Where(a => !a.IsBindable).ToArray();
+            var unboundActions = configurations.Where(a => !a.IsBindable).ToArray();
             if (unboundActions.Length > 0)
             {
-                HashSet<string> unboundActionNames = new HashSet<string>();
-                foreach (ActionConfiguration action in unboundActions)
+                var unboundActionNames = new HashSet<string>();
+                foreach (var action in unboundActions)
                 {
                     if (!unboundActionNames.Contains(action.Name))
                     {
@@ -330,17 +330,17 @@ namespace Microsoft.AspNetCore.OData.Builder
             }
 
             // 2. validate each bound overload action specifies a diffrent binding parameter type
-            ActionConfiguration[] boundActions = configurations.Where(a => a.IsBindable).ToArray();
+            var boundActions = configurations.Where(a => a.IsBindable).ToArray();
             if (boundActions.Length > 0)
             {
                 var actionNamesToBindingTypes = new Dictionary<string, IList<IEdmTypeConfiguration>>();
-                foreach (ActionConfiguration action in boundActions)
+                foreach (var action in boundActions)
                 {
-                    IEdmTypeConfiguration newBindingType = action.BindingParameter.TypeConfiguration;
+                    var newBindingType = action.BindingParameter.TypeConfiguration;
                     if (actionNamesToBindingTypes.ContainsKey(action.Name))
                     {
-                        IList<IEdmTypeConfiguration> bindingTypes = actionNamesToBindingTypes[action.Name];
-                        foreach (IEdmTypeConfiguration type in bindingTypes)
+                        var bindingTypes = actionNamesToBindingTypes[action.Name];
+                        foreach (var type in bindingTypes)
                         {
                             if (type == newBindingType)
                             {
@@ -364,18 +364,18 @@ namespace Microsoft.AspNetCore.OData.Builder
         private static Dictionary<Type, IEdmType> AddTypes(this EdmModel model, IEnumerable<StructuralTypeConfiguration> types,
             IEnumerable<EnumTypeConfiguration> enumTypes)
         {
-            IEnumerable<IEdmTypeConfiguration> configTypes = types.Concat<IEdmTypeConfiguration>(enumTypes);
+            var configTypes = types.Concat<IEdmTypeConfiguration>(enumTypes);
 
             // build types
-            EdmTypeMap edmTypeMap = EdmTypeBuilder.GetTypesAndProperties(configTypes);
-            Dictionary<Type, IEdmType> edmTypes = edmTypeMap.EdmTypes;
+            var edmTypeMap = EdmTypeBuilder.GetTypesAndProperties(configTypes);
+            var edmTypes = edmTypeMap.EdmTypes;
 
             // Add an annotate types
             model.AddTypes(edmTypes);
             model.AddClrTypeAnnotations(edmTypes);
 
             // add annotation for properties
-            Dictionary<PropertyInfo, IEdmProperty> edmProperties = edmTypeMap.EdmProperties;
+            var edmProperties = edmTypeMap.EdmProperties;
             model.AddClrPropertyInfoAnnotations(edmProperties);
             model.AddPropertyRestrictionsAnnotations(edmTypeMap.EdmPropertiesRestrictions);
 
@@ -427,22 +427,22 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private static void AddClrTypeAnnotations(this EdmModel model, Dictionary<Type, IEdmType> edmTypes)
         {
-            foreach (KeyValuePair<Type, IEdmType> map in edmTypes)
+            foreach (var map in edmTypes)
             {
                 // pre-populate the model with clr-type annotations so that we dont have to scan 
                 // all loaded assemblies to find the clr type for an edm type that we build.
-                IEdmType edmType = map.Value;
-                Type clrType = map.Key;
+                var edmType = map.Value;
+                var clrType = map.Key;
                 model.SetAnnotationValue<ClrTypeAnnotation>(edmType, new ClrTypeAnnotation(clrType));
             }
         }
 
         private static void AddClrPropertyInfoAnnotations(this EdmModel model, Dictionary<PropertyInfo, IEdmProperty> edmProperties)
         {
-            foreach (KeyValuePair<PropertyInfo, IEdmProperty> edmPropertyMap in edmProperties)
+            foreach (var edmPropertyMap in edmProperties)
             {
-                IEdmProperty edmProperty = edmPropertyMap.Value;
-                PropertyInfo clrProperty = edmPropertyMap.Key;
+                var edmProperty = edmPropertyMap.Value;
+                var clrProperty = edmPropertyMap.Key;
                 if (edmProperty.Name != clrProperty.Name)
                 {
                     model.SetAnnotationValue(edmProperty, new ClrPropertyInfoAnnotation(clrProperty));
@@ -453,20 +453,20 @@ namespace Microsoft.AspNetCore.OData.Builder
         private static void AddDynamicPropertyDictionaryAnnotations(this EdmModel model,
             Dictionary<IEdmStructuredType, PropertyInfo> openTypes)
         {
-            foreach (KeyValuePair<IEdmStructuredType, PropertyInfo> openType in openTypes)
+            foreach (var openType in openTypes)
             {
-                IEdmStructuredType edmStructuredType = openType.Key;
-                PropertyInfo propertyInfo = openType.Value;
+                var edmStructuredType = openType.Key;
+                var propertyInfo = openType.Value;
                 model.SetAnnotationValue(edmStructuredType, new DynamicPropertyDictionaryAnnotation(propertyInfo));
             }
         }
 
         private static void AddPropertyRestrictionsAnnotations(this EdmModel model, Dictionary<IEdmProperty, QueryableRestrictions> edmPropertiesRestrictions)
         {
-            foreach (KeyValuePair<IEdmProperty, QueryableRestrictions> edmPropertyRestriction in edmPropertiesRestrictions)
+            foreach (var edmPropertyRestriction in edmPropertiesRestrictions)
             {
-                IEdmProperty edmProperty = edmPropertyRestriction.Key;
-                QueryableRestrictions restrictions = edmPropertyRestriction.Value;
+                var edmProperty = edmPropertyRestriction.Key;
+                var restrictions = edmPropertyRestriction.Value;
                 model.SetAnnotationValue(edmProperty, new QueryableRestrictionsAnnotation(restrictions));
             }
         }
@@ -478,7 +478,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 EdmNavigationSource navigationSource;
                 if (navigationSources.TryGetValue(procedure.NavigationSource.Name, out navigationSource))
                 {
-                    EdmEntitySet entitySet = navigationSource as EdmEntitySet;
+                    var entitySet = navigationSource as EdmEntitySet;
                     if (entitySet != null)
                     {
                         return new EdmEntitySetReferenceExpression(entitySet);
@@ -506,17 +506,17 @@ namespace Microsoft.AspNetCore.OData.Builder
                 return null;
             }
 
-            EdmTypeKind kind = configuration.Kind;
+            var kind = configuration.Kind;
             if (kind == EdmTypeKind.Collection)
             {
-                CollectionTypeConfiguration collectionType = (CollectionTypeConfiguration)configuration;
-                EdmCollectionType edmCollectionType =
+                var collectionType = (CollectionTypeConfiguration)configuration;
+                var edmCollectionType =
                     new EdmCollectionType(GetEdmTypeReference(availableTypes, collectionType.ElementType, nullable));
                 return new EdmCollectionTypeReference(edmCollectionType);
             }
             else
             {
-                Type configurationClrType = TypeHelper.GetUnderlyingTypeOrSelf(configuration.ClrType);
+                var configurationClrType = TypeHelper.GetUnderlyingTypeOrSelf(configuration.ClrType);
 
                 if (!configurationClrType.GetTypeInfo().IsEnum)
                 {
@@ -546,7 +546,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 }
                 else if (configuration.Kind == EdmTypeKind.Primitive)
                 {
-                    PrimitiveTypeConfiguration primitiveTypeConfiguration = configuration as PrimitiveTypeConfiguration;
+                    var primitiveTypeConfiguration = configuration as PrimitiveTypeConfiguration;
                     return new EdmPrimitiveTypeReference(primitiveTypeConfiguration.EdmPrimitiveType, nullable);
                 }
                 else
@@ -568,7 +568,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("navigationSource");
             }
 
-            NavigationSourceUrlAnnotation annotation = model.GetAnnotationValue<NavigationSourceUrlAnnotation>(navigationSource);
+            var annotation = model.GetAnnotationValue<NavigationSourceUrlAnnotation>(navigationSource);
             if (annotation == null)
             {
                 return navigationSource.Name;
@@ -601,7 +601,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 throw Error.ArgumentNull("entityType");
             }
 
-            BindableProcedureFinder annotation = model.GetAnnotationValue<BindableProcedureFinder>(model);
+            var annotation = model.GetAnnotationValue<BindableProcedureFinder>(model);
             if (annotation == null)
             {
                 annotation = new BindableProcedureFinder(model);

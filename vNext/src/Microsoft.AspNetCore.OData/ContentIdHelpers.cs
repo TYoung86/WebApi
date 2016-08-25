@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.OData
             Contract.Assert(url != null);
             Contract.Assert(contentIdToLocationMapping != null);
 
-            int startIndex = 0;
+            var startIndex = 0;
 
             while (true)
             {
@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData
                     break;
                 }
 
-                int keyLength = 0;
+                var keyLength = 0;
 
                 while (startIndex + keyLength < url.Length - 1 && IsContentIdCharacter(url[startIndex + keyLength + 1]))
                 {
@@ -36,7 +36,7 @@ namespace Microsoft.AspNetCore.OData
                 if (keyLength > 0)
                 {
                     // Might have matched a $<content-id> alias.
-                    string locationKey = url.Substring(startIndex + 1, keyLength);
+                    var locationKey = url.Substring(startIndex + 1, keyLength);
                     string locationValue;
 
                     if (contentIdToLocationMapping.TryGetValue(locationKey, out locationValue))

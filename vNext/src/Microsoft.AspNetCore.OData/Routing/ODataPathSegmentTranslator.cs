@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             ReverseRefPathSegmentAndKeyValuePathSegment(segments);
-            ODataPath odataPath = new ODataPath(segments);
+            var odataPath = new ODataPath(segments);
             odataPath.ODLPath = path;
 
             return odataPath;
@@ -122,7 +122,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 throw Error.ArgumentNull("parameterAliasNodes");
             }
 
-            ParameterAliasNode parameterAliasNode = node as ParameterAliasNode;
+            var parameterAliasNode = node as ParameterAliasNode;
 
             if (parameterAliasNode == null)
             {
@@ -155,7 +155,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <returns>Translated WebApi path segment</returns>
         public override IEnumerable<ODataPathSegment> Translate(TypeSegment segment)
         {
-            IEdmType elementType = segment.EdmType;
+            var elementType = segment.EdmType;
             if (segment.EdmType.TypeKind == EdmTypeKind.Collection)
             {
                 elementType = ((IEdmCollectionType)segment.EdmType).ElementType.Definition;
@@ -228,7 +228,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <returns>Translated WebApi path segment.</returns>
         public override IEnumerable<ODataPathSegment> Translate(OperationImportSegment segment)
         {
-            IEdmActionImport actionImport = segment.OperationImports.Single() as IEdmActionImport;
+            var actionImport = segment.OperationImports.Single() as IEdmActionImport;
 
             if (actionImport != null)
             {
@@ -237,7 +237,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             else
             {
                 // Translate the nodes in ODL path to string literals as parameter of UnboundFunctionPathSegment.
-                Dictionary<string, string> parameterValues = segment.Parameters.ToDictionary(
+                var parameterValues = segment.Parameters.ToDictionary(
                     parameterValue => parameterValue.Name,
                     parameterValue => TranslateNode(parameterValue.Value));
 
@@ -255,7 +255,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <returns>Translated WebApi path segment.</returns>
         public override IEnumerable<ODataPathSegment> Translate(OperationSegment segment)
         {
-            IEdmAction action = segment.Operations.Single() as IEdmAction;
+            var action = segment.Operations.Single() as IEdmAction;
 
             if (action != null)
             {
@@ -264,10 +264,10 @@ namespace Microsoft.AspNetCore.OData.Routing
             else
             {
                 // Translate the nodes in ODL path to string literals as parameter of BoundFunctionPathSegment.
-                Dictionary<string, string> parameterValues = segment.Parameters.ToDictionary(
+                var parameterValues = segment.Parameters.ToDictionary(
                     parameterValue => parameterValue.Name,
                     parameterValue => TranslateNode(parameterValue.Value));
-                IEdmFunction function = (IEdmFunction)segment.Operations.Single();
+                var function = (IEdmFunction)segment.Operations.Single();
 
                 yield return new BoundFunctionPathSegment(function, _model, parameterValues);
             }
@@ -354,7 +354,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <returns>Translated WebApi path segment.</returns>
         public override IEnumerable<ODataPathSegment> Translate(PathTemplateSegment segment)
         {
-            string value = String.Empty;
+            var value = String.Empty;
             switch (TranslatePathTemplateSegment(segment.LiteralText, out value))
             {
                 case ODataSegmentKinds._DynamicProperty:
@@ -390,7 +390,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 segments[segments.Count - 2] is RefPathSegment &&
                 segments[segments.Count - 1] is KeyValuePathSegment)
             {
-                ODataPathSegment segment = segments[segments.Count - 2];
+                var segment = segments[segments.Count - 2];
                 segments[segments.Count - 2] = segments[segments.Count - 1];
                 segments[segments.Count - 1] = segment;
             }
@@ -434,17 +434,17 @@ namespace Microsoft.AspNetCore.OData.Routing
 
             if (enableUriTemplateParsing)
             {
-                UriTemplateExpression uriTemplateExpression = value as UriTemplateExpression;
+                var uriTemplateExpression = value as UriTemplateExpression;
                 if (uriTemplateExpression != null)
                 {
                     return uriTemplateExpression.LiteralText;
                 }
             }
 
-            ConstantNode constantNode = value as ConstantNode;
+            var constantNode = value as ConstantNode;
             if (constantNode != null)
             {
-                ODataEnumValue enumValue = constantNode.Value as ODataEnumValue;
+                var enumValue = constantNode.Value as ODataEnumValue;
                 if (enumValue != null)
                 {
                     return ODataUriUtils.ConvertToUriLiteral(enumValue, ODataVersion.V4);
@@ -465,7 +465,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             if (pathTemplateSegmentLiteralText.StartsWith("{", StringComparison.Ordinal)
                 && pathTemplateSegmentLiteralText.EndsWith("}", StringComparison.Ordinal))
             {
-                string[] keyValuePair = pathTemplateSegmentLiteralText.Substring(1,
+                var keyValuePair = pathTemplateSegmentLiteralText.Substring(1,
                     pathTemplateSegmentLiteralText.Length - 2).Split(':');
                 if (keyValuePair.Length != 2)
                 {
@@ -489,12 +489,12 @@ namespace Microsoft.AspNetCore.OData.Routing
                 throw Error.ArgumentNull("node");
             }
 
-            ConstantNode constantNode = node as ConstantNode;
+            var constantNode = node as ConstantNode;
             if (constantNode != null)
             {
                 if (_enableUriTemplateParsing)
                 {
-                    UriTemplateExpression uriTemplateExpression = constantNode.Value as UriTemplateExpression;
+                    var uriTemplateExpression = constantNode.Value as UriTemplateExpression;
                     if (uriTemplateExpression != null)
                     {
                         return uriTemplateExpression.LiteralText;
@@ -502,7 +502,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 }
 
                 // Make the enum prefix free to work.
-                ODataEnumValue enumValue = constantNode.Value as ODataEnumValue;
+                var enumValue = constantNode.Value as ODataEnumValue;
                 if (enumValue != null)
                 {
                     return ODataUriUtils.ConvertToUriLiteral(enumValue, ODataVersion.V4);
@@ -511,13 +511,13 @@ namespace Microsoft.AspNetCore.OData.Routing
                 return constantNode.LiteralText;
             }
 
-            ConvertNode convertNode = node as ConvertNode;
+            var convertNode = node as ConvertNode;
             if (convertNode != null)
             {
                 return TranslateNode(convertNode.Source);
             }
 
-            ParameterAliasNode parameterAliasNode = node as ParameterAliasNode;
+            var parameterAliasNode = node as ParameterAliasNode;
             if (parameterAliasNode != null)
             {
                 return TranslateParameterAlias(parameterAliasNode.Alias);

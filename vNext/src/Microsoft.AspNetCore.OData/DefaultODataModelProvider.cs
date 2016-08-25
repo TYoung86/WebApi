@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData
             foreach (var property in publicProperties)
             {
                 var entityClrType = TypeHelper.GetImplementedIEnumerableType(property.PropertyType);
-                EntityTypeConfiguration entity = builder.AddEntityType(entityClrType);
+                var entity = builder.AddEntityType(entityClrType);
                 builder.AddEntitySet(property.Name, entity);
             }
 

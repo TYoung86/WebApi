@@ -52,10 +52,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private void WriteResponseBody(OutputFormatterWriteContext context)
         {
-            HttpRequest request = context.HttpContext.Request;
-            HttpResponse response = context.HttpContext.Response;
+            var request = context.HttpContext.Request;
+            var response = context.HttpContext.Response;
 
-            IEdmModel model = request.ODataProperties().Model;
+            var model = request.ODataProperties().Model;
             if (model == null)
             {
                 throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
@@ -76,18 +76,18 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
             var type = value.GetType();
 
-            ODataSerializer serializer = GetSerializer(type, value, model, new DefaultODataSerializerProvider(), request);
+            var serializer = GetSerializer(type, value, model, new DefaultODataSerializerProvider(), request);
 
-            IUrlHelper urlHelper = context.HttpContext.UrlHelper();
+            var urlHelper = context.HttpContext.UrlHelper();
 
-            ODataPath path = request.ODataProperties().Path;
-            IEdmNavigationSource targetNavigationSource = path == null ? null : path.NavigationSource;
+            var path = request.ODataProperties().Path;
+            var targetNavigationSource = path == null ? null : path.NavigationSource;
 
-            string preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(request);
+            var preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(request);
             string annotationFilter = null;
             if (!String.IsNullOrEmpty(preferHeader))
             {
-                ODataMessageWrapper messageWrapper = new ODataMessageWrapper(response.Body, response.Headers);
+                var messageWrapper = new ODataMessageWrapper(response.Body, response.Headers);
                 messageWrapper.SetHeader(RequestPreferenceHelpers.PreferHeaderName, preferHeader);
                 annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
             }
@@ -98,14 +98,14 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;
             }
 
-            Uri baseAddress = GetBaseAddress(request);
-            ODataMessageWriterSettings writerSettings = new ODataMessageWriterSettings(_messageWriterSettings)
+            var baseAddress = GetBaseAddress(request);
+            var writerSettings = new ODataMessageWriterSettings(_messageWriterSettings)
             {
                 PayloadBaseUri = baseAddress,
                 Version = ODataProperties.DefaultODataVersion,
             };
 
-            string metadataLink = urlHelper.CreateODataLink(request, new MetadataPathSegment());
+            var metadataLink = urlHelper.CreateODataLink(request, new MetadataPathSegment());
             if (metadataLink == null)
             {
                 throw new SerializationException(SRResources.UnableToDetermineMetadataUrl);
@@ -121,9 +121,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 //Path = (path == null || IsOperationPath(path)) ? null : path.ODLPath,
             };
 
-            using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
+            using (var messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
             {
-                ODataSerializerContext writeContext = new ODataSerializerContext()
+                var writeContext = new ODataSerializerContext()
                 {
                     Request = request,
                     RequestContext = request.HttpContext,
@@ -143,8 +143,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         public override void WriteResponseHeaders(OutputFormatterWriteContext context)
         {
-            HttpRequest request = context.HttpContext.Request;
-            HttpResponse response = context.HttpContext.Response;
+            var request = context.HttpContext.Request;
+            var response = context.HttpContext.Response;
 
             //// When the user asks for application/json we really need to set the content type to
             //// application/json; odata.metadata=minimal. If the user provides the media type and is
@@ -204,7 +204,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             if (request != null)
             {
-                IEdmModel model = request.ODataProperties().Model;
+                var model = request.ODataProperties().Model;
                 if (model != null)
                 {
                     ODataPayloadKind? payloadKind = null;
@@ -231,10 +231,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             ODataSerializer serializer;
 
-            IEdmObject edmObject = value as IEdmObject;
+            var edmObject = value as IEdmObject;
             if (edmObject != null)
             {
-                IEdmTypeReference edmType = edmObject.GetEdmType();
+                var edmType = edmObject.GetEdmType();
                 if (edmType == null)
                 {
                     throw new SerializationException(Error.Format(SRResources.EdmTypeCannotBeNull,
@@ -244,7 +244,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 serializer = serializerProvider.GetEdmTypeSerializer(edmType);
                 if (serializer == null)
                 {
-                    string message = Error.Format(SRResources.TypeCannotBeSerialized, edmType.ToTraceString(), typeof(ODataOutputFormatter).Name);
+                    var message = Error.Format(SRResources.TypeCannotBeSerialized, edmType.ToTraceString(), typeof(ODataOutputFormatter).Name);
                     throw new SerializationException(message);
                 }
             }
@@ -255,7 +255,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 serializer = serializerProvider.GetODataPayloadSerializer(model, type, request);
                 if (serializer == null)
                 {
-                    string message = Error.Format(SRResources.TypeCannotBeSerialized, type.Name, typeof(ODataOutputFormatter).Name);
+                    var message = Error.Format(SRResources.TypeCannotBeSerialized, type.Name, typeof(ODataOutputFormatter).Name);
                     throw new SerializationException(message);
                 }
             }
@@ -265,9 +265,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         private static Uri GetBaseAddress(HttpRequest request)
         {
-            IUrlHelper urlHelper = request.HttpContext.UrlHelper();
+            var urlHelper = request.HttpContext.UrlHelper();
 
-            string baseAddress = urlHelper.CreateODataLink(request);
+            var baseAddress = urlHelper.CreateODataLink(request);
             if (baseAddress == null)
             {
                 throw new SerializationException(SRResources.UnableToDetermineBaseUrl);
@@ -287,7 +287,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return false;
             }
 
-            foreach (ODataPathSegment segment in path.Segments)
+            foreach (var segment in path.Segments)
             {
                 switch (segment.SegmentKind)
                 {
@@ -306,16 +306,16 @@ namespace Microsoft.AspNetCore.OData.Formatter
         {
             if (path != null)
             {
-                ODataPathSegment lastSegment = path.Segments.LastOrDefault();
+                var lastSegment = path.Segments.LastOrDefault();
                 if (lastSegment != null)
                 {
-                    BoundActionPathSegment actionSegment = lastSegment as BoundActionPathSegment;
+                    var actionSegment = lastSegment as BoundActionPathSegment;
                     if (actionSegment != null)
                     {
                         return actionSegment.Action.Name;
                     }
 
-                    PropertyAccessPathSegment propertyAccessSegment = lastSegment as PropertyAccessPathSegment;
+                    var propertyAccessSegment = lastSegment as PropertyAccessPathSegment;
                     if (propertyAccessSegment != null)
                     {
                         return propertyAccessSegment.Property.Name;
@@ -371,7 +371,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             //    type = type.GetGenericArguments()[0];
             //}
 
-            ODataSerializer serializer = _serializerProvider.GetODataPayloadSerializer(model, type, request);
+            var serializer = _serializerProvider.GetODataPayloadSerializer(model, type, request);
             return serializer == null ? null : (ODataPayloadKind?)serializer.ODataPayloadKind;
         }
     }

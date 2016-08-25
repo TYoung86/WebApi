@@ -120,7 +120,7 @@ namespace Microsoft.AspNetCore.OData.Builder
                 {
                     yield return _bindingParameter;
                 }
-                foreach (ParameterConfiguration parameter in _parameters)
+                foreach (var parameter in _parameters)
                 {
                     yield return parameter;
                 }
@@ -160,10 +160,10 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "In keeping with rest of API")]
         internal void ReturnsCollectionFromEntitySetImplementation<TElementEntityType>(string entitySetName) where TElementEntityType : class
         {
-            Type clrCollectionType = typeof(IEnumerable<TElementEntityType>);
+            var clrCollectionType = typeof(IEnumerable<TElementEntityType>);
             ModelBuilder.EntitySet<TElementEntityType>(entitySetName);
             NavigationSource = ModelBuilder.EntitySets.Single(s => s.Name == entitySetName);
-            IEdmTypeConfiguration elementType = ModelBuilder.GetTypeConfigurationOrNull(typeof(TElementEntityType));
+            var elementType = ModelBuilder.GetTypeConfigurationOrNull(typeof(TElementEntityType));
             ReturnType = new CollectionTypeConfiguration(elementType, clrCollectionType);
             OptionalReturn = true;
         }
@@ -187,8 +187,8 @@ namespace Microsoft.AspNetCore.OData.Builder
         /// <param name="entitySetPath">The entitySetPath which contains the returned EntityType instances</param>
         internal void ReturnsCollectionViaEntitySetPathImplementation<TElementEntityType>(IEnumerable<string> entitySetPath) where TElementEntityType : class
         {
-            Type clrCollectionType = typeof(IEnumerable<TElementEntityType>);
-            IEdmTypeConfiguration elementType = ModelBuilder.GetTypeConfigurationOrNull(typeof(TElementEntityType));
+            var clrCollectionType = typeof(IEnumerable<TElementEntityType>);
+            var elementType = ModelBuilder.GetTypeConfigurationOrNull(typeof(TElementEntityType));
             ReturnType = new CollectionTypeConfiguration(elementType, clrCollectionType);
             EntitySetPath = entitySetPath;
             OptionalReturn = true;
@@ -201,8 +201,8 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "In keeping with rest of API")]
         internal void ReturnsImplementation<TReturnType>()
         {
-            Type returnType = typeof(TReturnType);
-            IEdmTypeConfiguration configuration = GetProcedureTypeConfiguration(returnType);
+            var returnType = typeof(TReturnType);
+            var configuration = GetProcedureTypeConfiguration(returnType);
             ReturnType = configuration;
             OptionalReturn = EdmLibHelpers.IsNullable(returnType);
         }
@@ -218,9 +218,9 @@ namespace Microsoft.AspNetCore.OData.Builder
             // It basically has no meaning. That said the CLR type is meaningful for IEdmTypeConfiguration
             // because I still think it is useful for IEdmPrimitiveTypes too.
             // You can imagine the override of this that takes a delegate using the correct CLR type for the return type.
-            Type clrCollectionType = typeof(IEnumerable<TReturnElementType>);
-            Type clrElementType = typeof(TReturnElementType);
-            IEdmTypeConfiguration edmElementType = GetProcedureTypeConfiguration(clrElementType);
+            var clrCollectionType = typeof(IEnumerable<TReturnElementType>);
+            var clrElementType = typeof(TReturnElementType);
+            var edmElementType = GetProcedureTypeConfiguration(clrElementType);
             ReturnType = new CollectionTypeConfiguration(edmElementType, clrCollectionType);
             OptionalReturn = EdmLibHelpers.IsNullable(clrElementType);
         }
@@ -249,7 +249,7 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "In keeping with rest of API")]
         public ParameterConfiguration Parameter<TParameter>(string name)
         {
-            IEdmTypeConfiguration parameterType = GetProcedureTypeConfiguration(typeof(TParameter));
+            var parameterType = GetProcedureTypeConfiguration(typeof(TParameter));
             return AddParameter(name, parameterType);
         }
 
@@ -259,9 +259,9 @@ namespace Microsoft.AspNetCore.OData.Builder
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "In keeping with rest of API")]
         public ParameterConfiguration CollectionParameter<TElementType>(string name)
         {
-            Type elementType = typeof(TElementType);
-            IEdmTypeConfiguration elementTypeConfiguration = GetProcedureTypeConfiguration(typeof(TElementType));
-            CollectionTypeConfiguration parameterType = new CollectionTypeConfiguration(elementTypeConfiguration, typeof(IEnumerable<>).MakeGenericType(elementType));
+            var elementType = typeof(TElementType);
+            var elementTypeConfiguration = GetProcedureTypeConfiguration(typeof(TElementType));
+            var parameterType = new CollectionTypeConfiguration(elementTypeConfiguration, typeof(IEnumerable<>).MakeGenericType(elementType));
             return AddParameter(name, parameterType);
         }
 
@@ -272,7 +272,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             Justification = "In keeping with rest of API")]
         public ParameterConfiguration EntityParameter<TEntityType>(string name) where TEntityType : class
         {
-            Type entityType = typeof(TEntityType);
+            var entityType = typeof(TEntityType);
             IEdmTypeConfiguration parameterType =
                 ModelBuilder.StructuralTypes.FirstOrDefault(t => t.ClrType == entityType) ??
                 ModelBuilder.AddEntityType(entityType);
@@ -287,12 +287,12 @@ namespace Microsoft.AspNetCore.OData.Builder
             Justification = "In keeping with rest of API")]
         public ParameterConfiguration CollectionEntityParameter<TElementEntityType>(string name) where TElementEntityType : class
         {
-            Type elementType = typeof(TElementEntityType);
+            var elementType = typeof(TElementEntityType);
             IEdmTypeConfiguration elementTypeConfiguration =
                 ModelBuilder.StructuralTypes.FirstOrDefault(t => t.ClrType == elementType) ??
                 ModelBuilder.AddEntityType(elementType);
 
-            CollectionTypeConfiguration parameterType = new CollectionTypeConfiguration(elementTypeConfiguration,
+            var parameterType = new CollectionTypeConfiguration(elementTypeConfiguration,
                 typeof(IEnumerable<>).MakeGenericType(elementType));
 
             return AddParameter(name, parameterType);
@@ -305,7 +305,7 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private IEdmTypeConfiguration GetProcedureTypeConfiguration(Type clrType)
         {
-            Type type = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
+            var type = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
             IEdmTypeConfiguration edmTypeConfiguration;
 
             if (type.GetTypeInfo().IsEnum)
@@ -326,7 +326,7 @@ namespace Microsoft.AspNetCore.OData.Builder
             {
                 if (type.GetTypeInfo().IsEnum)
                 {
-                    EnumTypeConfiguration enumTypeConfiguration = ModelBuilder.AddEnumType(type);
+                    var enumTypeConfiguration = ModelBuilder.AddEnumType(type);
 
                     if (EdmLibHelpers.IsNullable(clrType))
                     {

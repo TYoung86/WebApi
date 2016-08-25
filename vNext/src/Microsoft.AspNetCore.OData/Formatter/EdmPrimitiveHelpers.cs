@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return value;
             }
 
-            string str = value as string;
+            var str = value as string;
 
             if (type == typeof(char))
             {
@@ -83,8 +83,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 {
                     if (value is DateTimeOffset)
                     {
-                        DateTimeOffset dateTimeOffsetValue = (DateTimeOffset)value;
-                        TimeZoneInfo timeZone = TimeZoneInfoHelper.TimeZone;
+                        var dateTimeOffsetValue = (DateTimeOffset)value;
+                        var timeZone = TimeZoneInfoHelper.TimeZone;
                         dateTimeOffsetValue = dateTimeOffsetValue.ToUniversalTime().ToOffset(timeZone.BaseUtcOffset);
                         return dateTimeOffsetValue.DateTime;
                     }

@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (Action != null)
             {
-                IEdmTypeReference returnType = Action.ReturnType;
+                var returnType = Action.ReturnType;
                 if (returnType != null)
                 {
                     return returnType.Definition;
@@ -87,7 +87,7 @@ namespace Microsoft.AspNetCore.OData.Routing
             }
 
             // Try to use the entity set annotation to get the target navigation source.
-            ReturnedEntitySetAnnotation entitySetAnnotation =
+            var entitySetAnnotation =
                     _edmModel.GetAnnotationValue<ReturnedEntitySetAnnotation>(Action);
 
             if (entitySetAnnotation != null)
@@ -106,8 +106,8 @@ namespace Microsoft.AspNetCore.OData.Routing
                 if (Action.TryGetRelativeEntitySetPath(_edmModel, out parameter, out navigationProperties,
                     out lastEntityType, out errors))
                 {
-                    IEdmNavigationSource targetNavigationSource = previousNavigationSource;
-                    foreach (IEdmNavigationProperty navigationProperty in navigationProperties)
+                    var targetNavigationSource = previousNavigationSource;
+                    foreach (var navigationProperty in navigationProperties)
                     {
                         targetNavigationSource = targetNavigationSource.FindNavigationTarget(navigationProperty);
                         if (targetNavigationSource == null)
@@ -139,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.Action)
             {
-                BoundActionPathSegment actionSegment = (BoundActionPathSegment)pathSegment;
+                var actionSegment = (BoundActionPathSegment)pathSegment;
                 return actionSegment.Action == Action && actionSegment.ActionName == ActionName;
             }
 

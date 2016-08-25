@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.Argument("writeContext", SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
             }
 
-            IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
+            var edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
             messageWriter.WriteProperty(CreateProperty(graph, edmType, writeContext.RootElementName, writeContext));
@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.InvalidOperation(SRResources.CannotWriteType, typeof(ODataEnumSerializer).Name, expectedType.FullName());
             }
 
-            ODataEnumValue value = CreateODataEnumValue(graph, expectedType.AsEnum(), writeContext);
+            var value = CreateODataEnumValue(graph, expectedType.AsEnum(), writeContext);
             if (value == null)
             {
                 return new ODataNullValue();
@@ -90,9 +90,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            ODataEnumValue enumValue = new ODataEnumValue(value, enumType.FullName());
+            var enumValue = new ODataEnumValue(value, enumType.FullName());
 
-            ODataMetadataLevel metadataLevel = writeContext != null
+            var metadataLevel = writeContext != null
                 ? writeContext.MetadataLevel
                 : ODataMetadataLevel.MinimalMetadata;
             AddTypeNameAnnotationAsNeeded(enumValue, enumType, metadataLevel);

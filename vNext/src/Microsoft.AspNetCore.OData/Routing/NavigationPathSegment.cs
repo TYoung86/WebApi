@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.Navigation)
             {
-                NavigationPathSegment navigationSegment = (NavigationPathSegment)pathSegment;
+                var navigationSegment = (NavigationPathSegment)pathSegment;
                 return navigationSegment.NavigationProperty == NavigationProperty
                     && navigationSegment.NavigationPropertyName == NavigationPropertyName;
             }

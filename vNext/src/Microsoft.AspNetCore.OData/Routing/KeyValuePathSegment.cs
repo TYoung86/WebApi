@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         /// <inheritdoc/>
         public override IEdmType GetEdmType(IEdmType previousEdmType)
         {
-            IEdmCollectionType previousCollectionType = previousEdmType as IEdmCollectionType;
+            var previousCollectionType = previousEdmType as IEdmCollectionType;
             if (previousCollectionType != null)
             {
                 return previousCollectionType.ElementType.Definition;

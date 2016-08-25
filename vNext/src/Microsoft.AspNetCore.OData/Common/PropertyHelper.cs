@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             Contract.Assert(propertyInfo != null);
 
-            MethodInfo setMethod = propertyInfo.GetSetMethod();
+            var setMethod = propertyInfo.GetSetMethod();
 
             Contract.Assert(setMethod != null);
             Contract.Assert(!setMethod.IsStatic);
@@ -50,8 +50,8 @@ namespace Microsoft.AspNetCore.OData.Common
             // Instance methods in the CLR can be turned into static methods where the first parameter
             // is open over "this". This parameter is always passed by reference, so we have a code
             // path for value types and a code path for reference types.
-            Type typeInput = propertyInfo.DeclaringType;
-            Type typeValue = setMethod.GetParameters()[0].ParameterType;
+            var typeInput = propertyInfo.DeclaringType;
+            var typeValue = setMethod.GetParameters()[0].ParameterType;
 
             Delegate callPropertySetterDelegate;
 
@@ -92,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.Common
         {
             Contract.Assert(propertyInfo != null);
 
-            MethodInfo getMethod = propertyInfo.GetGetMethod();
+            var getMethod = propertyInfo.GetGetMethod();
             Contract.Assert(getMethod != null);
             Contract.Assert(!getMethod.IsStatic);
             Contract.Assert(getMethod.GetParameters().Length == 0);
@@ -100,22 +100,22 @@ namespace Microsoft.AspNetCore.OData.Common
             // Instance methods in the CLR can be turned into static methods where the first parameter
             // is open over "this". This parameter is always passed by reference, so we have a code
             // path for value types and a code path for reference types.
-            Type typeInput = getMethod.DeclaringType;
-            Type typeOutput = getMethod.ReturnType;
+            var typeInput = getMethod.DeclaringType;
+            var typeOutput = getMethod.ReturnType;
 
             Delegate callPropertyGetterDelegate;
             if (typeInput.GetTypeInfo().IsValueType)
             {
                 // Create a delegate (ref TDeclaringType) -> TValue
-                Delegate propertyGetterAsFunc = getMethod.CreateDelegate(typeof(ByRefFunc<,>).MakeGenericType(typeInput, typeOutput));
-                MethodInfo callPropertyGetterClosedGenericMethod = _callPropertyGetterByReferenceOpenGenericMethod.MakeGenericMethod(typeInput, typeOutput);
+                var propertyGetterAsFunc = getMethod.CreateDelegate(typeof(ByRefFunc<,>).MakeGenericType(typeInput, typeOutput));
+                var callPropertyGetterClosedGenericMethod = _callPropertyGetterByReferenceOpenGenericMethod.MakeGenericMethod(typeInput, typeOutput);
                 callPropertyGetterDelegate = callPropertyGetterClosedGenericMethod.CreateDelegate(typeof (Func<object, object>), propertyGetterAsFunc);
             }
             else
             {
                 // Create a delegate TDeclaringType -> TValue
-                Delegate propertyGetterAsFunc = getMethod.CreateDelegate(typeof(Func<,>).MakeGenericType(typeInput, typeOutput));
-                MethodInfo callPropertyGetterClosedGenericMethod = _callPropertyGetterOpenGenericMethod.MakeGenericMethod(typeInput, typeOutput);
+                var propertyGetterAsFunc = getMethod.CreateDelegate(typeof(Func<,>).MakeGenericType(typeInput, typeOutput));
+                var callPropertyGetterClosedGenericMethod = _callPropertyGetterOpenGenericMethod.MakeGenericMethod(typeInput, typeOutput);
                 callPropertyGetterDelegate = callPropertyGetterClosedGenericMethod.CreateDelegate(typeof(Func<object, object>), propertyGetterAsFunc);
             }
 
@@ -140,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.Common
 
         private static object CallPropertyGetterByReference<TDeclaringType, TValue>(ByRefFunc<TDeclaringType, TValue> getter, object @this)
         {
-            TDeclaringType unboxed = (TDeclaringType)@this;
+            var unboxed = (TDeclaringType)@this;
             return getter(ref unboxed);
         }
 
@@ -159,21 +159,21 @@ namespace Microsoft.AspNetCore.OData.Common
             // Using an array rather than IEnumerable, as this will be called on the hot path numerous times.
             PropertyHelper[] helpers;
 
-            Type type = instance.GetType();
+            var type = instance.GetType();
 
             if (!cache.TryGetValue(type, out helpers))
             {
                 // We avoid loading indexed properties using the where statement.
                 // Indexed properties are not useful (or valid) for grabbing properties off an anonymous object.
-                IEnumerable<PropertyInfo> properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                                                            .Where(prop => prop.GetIndexParameters().Length == 0 &&
                                                                           prop.GetMethod != null);
 
                 var newHelpers = new List<PropertyHelper>();
 
-                foreach (PropertyInfo property in properties)
+                foreach (var property in properties)
                 {
-                    PropertyHelper propertyHelper = createPropertyHelper(property);
+                    var propertyHelper = createPropertyHelper(property);
 
                     newHelpers.Add(propertyHelper);
                 }

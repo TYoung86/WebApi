@@ -41,8 +41,8 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                 throw Error.ArgumentNull("model");
             }
 
-            bool isTypeDataContract = structuralTypeConfiguration.ClrType.GetTypeInfo().GetCustomAttributes(typeof(DataContractAttribute), inherit: true).Any();
-            DataMemberAttribute dataMember = attribute as DataMemberAttribute;
+            var isTypeDataContract = structuralTypeConfiguration.ClrType.GetTypeInfo().GetCustomAttributes(typeof(DataContractAttribute), inherit: true).Any();
+            var dataMember = attribute as DataMemberAttribute;
 
             if (isTypeDataContract && dataMember != null && !edmProperty.AddedExplicitly)
             {
@@ -53,13 +53,13 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
                     edmProperty.Name = dataMember.Name;
                 }
 
-                StructuralPropertyConfiguration structuralProperty = edmProperty as StructuralPropertyConfiguration;
+                var structuralProperty = edmProperty as StructuralPropertyConfiguration;
                 if (structuralProperty != null)
                 {
                     structuralProperty.OptionalProperty = !dataMember.IsRequired;
                 }
 
-                NavigationPropertyConfiguration navigationProperty = edmProperty as NavigationPropertyConfiguration;
+                var navigationProperty = edmProperty as NavigationPropertyConfiguration;
                 if (navigationProperty != null && navigationProperty.Multiplicity != EdmMultiplicity.Many)
                 {
                     if (dataMember.IsRequired)

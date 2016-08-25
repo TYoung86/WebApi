@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 startIndex = 0;
             }
 
-            int strLength = str.Length;
+            var strLength = str.Length;
 
             // String.Substring(int, int) accepts startIndex==length
             if (startIndex > strLength)

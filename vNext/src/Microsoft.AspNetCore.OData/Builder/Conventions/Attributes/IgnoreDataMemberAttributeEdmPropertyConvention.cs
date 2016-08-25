@@ -43,8 +43,8 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
 
             if (!edmProperty.AddedExplicitly)
             {
-                bool isTypeDataContract = structuralTypeConfiguration.ClrType.GetTypeInfo().GetCustomAttributes(typeof(DataContractAttribute), inherit: true).Any();
-                bool isPropertyDataMember = edmProperty.PropertyInfo.GetCustomAttributes(typeof(DataMemberAttribute), inherit: true).Any();
+                var isTypeDataContract = structuralTypeConfiguration.ClrType.GetTypeInfo().GetCustomAttributes(typeof(DataContractAttribute), inherit: true).Any();
+                var isPropertyDataMember = edmProperty.PropertyInfo.GetCustomAttributes(typeof(DataMemberAttribute), inherit: true).Any();
 
                 if (isTypeDataContract && isPropertyDataMember)
                 {

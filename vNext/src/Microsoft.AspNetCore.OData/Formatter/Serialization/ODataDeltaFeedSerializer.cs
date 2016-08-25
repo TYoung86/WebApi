@@ -50,17 +50,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaFeed));
             }
 
-            IEdmEntitySetBase entitySet = writeContext.NavigationSource as IEdmEntitySetBase;
+            var entitySet = writeContext.NavigationSource as IEdmEntitySetBase;
             if (entitySet == null)
             {
                 throw new SerializationException(SRResources.EntitySetMissingDuringSerialization);
             }
 
-            IEdmTypeReference feedType = writeContext.GetEdmType(graph, type);
+            var feedType = writeContext.GetEdmType(graph, type);
             Contract.Assert(feedType != null);
 
-            IEdmEntityTypeReference entityType = GetEntityType(feedType);
-            ODataDeltaWriter writer = messageWriter.CreateODataDeltaWriter(entitySet, entityType.EntityDefinition());
+            var entityType = GetEntityType(feedType);
+            var writer = messageWriter.CreateODataDeltaWriter(entitySet, entityType.EntityDefinition());
 
             WriteDeltaFeedInline(graph, feedType, writer, writeContext);
         }
@@ -93,7 +93,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaFeed));
             }
 
-            IEnumerable enumerable = graph as IEnumerable; // Data to serialize
+            var enumerable = graph as IEnumerable; // Data to serialize
             if (enumerable == null)
             {
                 throw new SerializationException(
@@ -111,14 +111,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(enumerable != null);
             Contract.Assert(feedType != null);
 
-            ODataDeltaFeed deltaFeed = CreateODataDeltaFeed(enumerable, feedType.AsCollection(), writeContext);
+            var deltaFeed = CreateODataDeltaFeed(enumerable, feedType.AsCollection(), writeContext);
             if (deltaFeed == null)
             {
                 throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, DeltaFeed));
             }
 
             // save this for later to support JSON odata.streaming.
-            Uri nextPageLink = deltaFeed.NextPageLink;
+            var nextPageLink = deltaFeed.NextPageLink;
             deltaFeed.NextPageLink = null;
 
             //Start writing of the Delta Feed
@@ -126,14 +126,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             //Iterate over all the entries present and select the appropriate write method.
             //Write method creates ODataDeltaDeletedEntry / ODataDeltaDeletedLink / ODataDeltaLink or ODataEntry.
-            foreach (object entry in enumerable)
+            foreach (var entry in enumerable)
             {
                 if (entry == null)
                 {
                     throw new SerializationException(SRResources.NullElementInCollection);
                 }
 
-                IEdmChangedObject edmChangedObject = entry as IEdmChangedObject;
+                var edmChangedObject = entry as IEdmChangedObject;
                 if (edmChangedObject == null)
                 {
                     throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, enumerable.GetType().FullName));
@@ -152,8 +152,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         break;
                     case EdmDeltaEntityKind.Entry:
                         {
-                            IEdmEntityTypeReference elementType = GetEntityType(feedType);
-                            ODataEntityTypeSerializer entrySerializer = SerializerProvider.GetEdmTypeSerializer(elementType) as ODataEntityTypeSerializer;
+                            var elementType = GetEntityType(feedType);
+                            var entrySerializer = SerializerProvider.GetEdmTypeSerializer(elementType) as ODataEntityTypeSerializer;
                             if (entrySerializer == null)
                             {
                                 throw new SerializationException(
@@ -191,12 +191,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         public virtual ODataDeltaFeed CreateODataDeltaFeed(IEnumerable feedInstance, IEdmCollectionTypeReference feedType,
             ODataSerializerContext writeContext)
         {
-            ODataDeltaFeed feed = new ODataDeltaFeed();
+            var feed = new ODataDeltaFeed();
 
             if (writeContext.ExpandedEntity == null)
             {
                 // If we have more OData format specific information apply it now, only if we are the root feed.
-                PageResult odataFeedAnnotations = feedInstance as PageResult;
+                var odataFeedAnnotations = feedInstance as PageResult;
                 if (odataFeedAnnotations != null)
                 {
                     feed.Count = odataFeedAnnotations.Count;
@@ -206,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     feed.NextPageLink = writeContext.Request.ODataProperties().NextLink;
 
-                    long? countValue = writeContext.Request.ODataProperties().TotalCount;
+                    var countValue = writeContext.Request.ODataProperties().TotalCount;
                     if (countValue.HasValue)
                     {
                         feed.Count = countValue.Value;
@@ -216,7 +216,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             else
             {
                 // nested feed
-                ITruncatedCollection truncatedCollection = feedInstance as ITruncatedCollection;
+                var truncatedCollection = feedInstance as ITruncatedCollection;
                 if (truncatedCollection != null && truncatedCollection.IsTruncated)
                 {
                     feed.NextPageLink = GetNestedNextPageLink(writeContext, truncatedCollection.PageSize);
@@ -234,13 +234,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
         public virtual void WriteDeltaDeletedEntry(object graph, ODataDeltaWriter writer, ODataSerializerContext writeContext)
         {
-            EdmDeltaDeletedEntityObject edmDeltaDeletedEntity = graph as EdmDeltaDeletedEntityObject;
+            var edmDeltaDeletedEntity = graph as EdmDeltaDeletedEntityObject;
             if (edmDeltaDeletedEntity == null)
             {
                 throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
             }
 
-            ODataDeltaDeletedEntry deltaDeletedEntry = new ODataDeltaDeletedEntry(
+            var deltaDeletedEntry = new ODataDeltaDeletedEntry(
                edmDeltaDeletedEntity.Id, edmDeltaDeletedEntity.Reason);
 
             if (deltaDeletedEntry != null)
@@ -258,13 +258,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
         public virtual void WriteDeltaDeletedLink(object graph, ODataDeltaWriter writer, ODataSerializerContext writeContext)
         {
-            EdmDeltaDeletedLink edmDeltaDeletedLink = graph as EdmDeltaDeletedLink;
+            var edmDeltaDeletedLink = graph as EdmDeltaDeletedLink;
             if (edmDeltaDeletedLink == null)
             {
                 throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
             }
 
-            ODataDeltaDeletedLink deltaDeletedLink = new ODataDeltaDeletedLink(
+            var deltaDeletedLink = new ODataDeltaDeletedLink(
                 edmDeltaDeletedLink.Source,
                 edmDeltaDeletedLink.Target,
                 edmDeltaDeletedLink.Relationship);
@@ -284,13 +284,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
         public virtual void WriteDeltaLink(object graph, ODataDeltaWriter writer, ODataSerializerContext writeContext)
         {
-            EdmDeltaLink edmDeltaLink = graph as EdmDeltaLink;
+            var edmDeltaLink = graph as EdmDeltaLink;
             if (edmDeltaLink == null)
             {
                 throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
             }
 
-            ODataDeltaLink deltaLink = new ODataDeltaLink(
+            var deltaLink = new ODataDeltaLink(
                 edmDeltaLink.Source,
                 edmDeltaLink.Target,
                 edmDeltaLink.Relationship);
@@ -305,14 +305,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (feedType.IsCollection())
             {
-                IEdmTypeReference elementType = feedType.AsCollection().ElementType();
+                var elementType = feedType.AsCollection().ElementType();
                 if (elementType.IsEntity())
                 {
                     return elementType.AsEntity();
                 }
             }
 
-            string message = Error.Format(SRResources.CannotWriteType, typeof(ODataFeedSerializer).Name, feedType.FullName());
+            var message = Error.Format(SRResources.CannotWriteType, typeof(ODataFeedSerializer).Name, feedType.FullName());
             throw new SerializationException(message);
         }
 
@@ -320,9 +320,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             Contract.Assert(writeContext.ExpandedEntity != null);
 
-            IEdmNavigationSource sourceNavigationSource = writeContext.ExpandedEntity.NavigationSource;
-            NavigationSourceLinkBuilderAnnotation linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
-            Uri navigationLink =
+            var sourceNavigationSource = writeContext.ExpandedEntity.NavigationSource;
+            var linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
+            var navigationLink =
                 linkBuilder.BuildNavigationLink(writeContext.ExpandedEntity, writeContext.NavigationProperty);
 
             if (navigationLink != null)

@@ -20,25 +20,25 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         internal static void ApplyProperty(ODataProperty property, IEdmStructuredTypeReference resourceType, object resource,
             ODataDeserializerProvider deserializerProvider, ODataDeserializerContext readContext)
         {
-            IEdmProperty edmProperty = resourceType.FindProperty(property.Name);
+            var edmProperty = resourceType.FindProperty(property.Name);
 
-            bool isDynamicProperty = false;
-            string propertyName = property.Name;
+            var isDynamicProperty = false;
+            var propertyName = property.Name;
             if (edmProperty != null)
             {
                 propertyName = EdmLibHelpers.GetClrPropertyName(edmProperty, readContext.Model);
             }
             else
             {
-                IEdmStructuredType structuredType = resourceType.StructuredDefinition();
+                var structuredType = resourceType.StructuredDefinition();
                 isDynamicProperty = structuredType != null && structuredType.IsOpen;
             }
 
             // dynamic properties have null values
-            IEdmTypeReference propertyType = edmProperty != null ? edmProperty.Type : null;
+            var propertyType = edmProperty != null ? edmProperty.Type : null;
 
             EdmTypeKind propertyKind;
-            object value = ConvertValue(property.Value, ref propertyType, deserializerProvider, readContext,
+            var value = ConvertValue(property.Value, ref propertyType, deserializerProvider, readContext,
                 out propertyKind);
 
             if (isDynamicProperty)
@@ -103,17 +103,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         {
             if (value != null)
             {
-                IEnumerable collection = value as IEnumerable;
+                var collection = value as IEnumerable;
                 Contract.Assert(collection != null,
                     "SetCollectionProperty is always passed the result of ODataFeedDeserializer or ODataCollectionDeserializer");
 
-                Type resourceType = resource.GetType();
-                Type propertyType = GetPropertyType(resource, propertyName);
+                var resourceType = resource.GetType();
+                var propertyType = GetPropertyType(resource, propertyName);
 
                 Type elementType;
                 if (!propertyType.IsCollection(out elementType))
                 {
-                    string message = Error.Format(SRResources.PropertyIsNotCollection, propertyType.FullName, propertyName, resourceType.FullName);
+                    var message = Error.Format(SRResources.PropertyIsNotCollection, propertyType.FullName, propertyName, resourceType.FullName);
                     throw new SerializationException(message);
                 }
 
@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     newCollection = GetProperty(resource, propertyName) as IEnumerable;
                     if (newCollection == null)
                     {
-                        string message = Error.Format(SRResources.CannotAddToNullCollection, propertyName, resourceType.FullName);
+                        var message = Error.Format(SRResources.CannotAddToNullCollection, propertyName, resourceType.FullName);
                         throw new SerializationException(message);
                     }
 
@@ -158,12 +158,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(readContext != null);
             Contract.Assert(readContext.Model != null);
 
-            IEnumerable collection = value as IEnumerable;
+            var collection = value as IEnumerable;
             Contract.Assert(collection != null);
 
-            Type resourceType = resource.GetType();
-            Type elementType = EdmLibHelpers.GetClrType(edmPropertyType.ElementType(), readContext.Model);
-            Type propertyType = typeof(ICollection<>).MakeGenericType(elementType);
+            var resourceType = resource.GetType();
+            var elementType = EdmLibHelpers.GetClrType(edmPropertyType.ElementType(), readContext.Model);
+            var propertyType = typeof(ICollection<>).MakeGenericType(elementType);
             IEnumerable newCollection;
             if (CollectionDeserializationHelpers.TryCreateInstance(propertyType, edmPropertyType, elementType,
                 out newCollection))
@@ -175,7 +175,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
         internal static void SetProperty(object resource, string propertyName, object value)
         {
-            IDelta delta = resource as IDelta;
+            var delta = resource as IDelta;
             if (delta == null)
             {
                 resource.GetType().GetProperty(propertyName).SetValue(resource, value, index: null);
@@ -189,14 +189,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         internal static void SetDynamicProperty(object resource, string propertyName, object value,
             IEdmStructuredType structuredType, ODataDeserializerContext readContext)
         {
-            IDelta delta = resource as IDelta;
+            var delta = resource as IDelta;
             if (delta != null)
             {
                 delta.TrySetPropertyValue(propertyName, value);
             }
             else
             {
-                PropertyInfo propertyInfo = EdmLibHelpers.GetDynamicPropertyDictionary(structuredType,
+                var propertyInfo = EdmLibHelpers.GetDynamicPropertyDictionary(structuredType,
                     readContext.Model);
                 if (propertyInfo == null)
                 {
@@ -204,7 +204,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
 
                 IDictionary<string, object> dynamicPropertyDictionary;
-                object dynamicDictionaryObject = propertyInfo.GetValue(resource);
+                var dynamicDictionaryObject = propertyInfo.GetValue(resource);
                 if (dynamicDictionaryObject == null)
                 {
                     if (!propertyInfo.CanWrite)
@@ -240,21 +240,21 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return null;
             }
 
-            ODataComplexValue complexValue = oDataValue as ODataComplexValue;
+            var complexValue = oDataValue as ODataComplexValue;
             if (complexValue != null)
             {
                 typeKind = EdmTypeKind.Complex;
                 return ConvertComplexValue(complexValue, ref propertyType, deserializerProvider, readContext);
             }
 
-            ODataEnumValue enumValue = oDataValue as ODataEnumValue;
+            var enumValue = oDataValue as ODataEnumValue;
             if (enumValue != null)
             {
                 typeKind = EdmTypeKind.Enum;
                 return ConvertEnumValue(enumValue, ref propertyType, deserializerProvider, readContext);
             }
 
-            ODataCollectionValue collection = oDataValue as ODataCollectionValue;
+            var collection = oDataValue as ODataCollectionValue;
             if (collection != null)
             {
                 typeKind = EdmTypeKind.Collection;
@@ -270,7 +270,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(resource != null);
             Contract.Assert(propertyName != null);
 
-            IDelta delta = resource as IDelta;
+            var delta = resource as IDelta;
             if (delta != null)
             {
                 Type type;
@@ -279,7 +279,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                PropertyInfo property = resource.GetType().GetProperty(propertyName);
+                var property = resource.GetType().GetProperty(propertyName);
                 return property == null ? null : property.PropertyType;
             }
         }
@@ -293,7 +293,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 // open complex property
                 Contract.Assert(!String.IsNullOrEmpty(complexValue.TypeName),
                     "ODataLib should have verified that open complex value has a type name since we provided metadata.");
-                IEdmModel model = readContext.Model;
+                var model = readContext.Model;
                 IEdmType edmType = model.FindType(complexValue.TypeName);
                 Contract.Assert(edmType.TypeKind == EdmTypeKind.Complex, "ODataLib should have verified that complex value has a complex resource type.");
                 edmComplexType = new EdmComplexTypeReference(edmType as IEdmComplexType, isNullable: true);
@@ -304,27 +304,27 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 edmComplexType = propertyType.AsComplex();
             }
 
-            ODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(edmComplexType);
+            var deserializer = deserializerProvider.GetEdmTypeDeserializer(edmComplexType);
             return deserializer.ReadInline(complexValue, propertyType, readContext);
         }
 
         private static bool CanSetProperty(object resource, string propertyName)
         {
-            IDelta delta = resource as IDelta;
+            var delta = resource as IDelta;
             if (delta != null)
             {
                 return true;
             }
             else
             {
-                PropertyInfo property = resource.GetType().GetProperty(propertyName);
+                var property = resource.GetType().GetProperty(propertyName);
                 return property != null && property.GetSetMethod() != null;
             }
         }
 
         private static object GetProperty(object resource, string propertyName)
         {
-            IDelta delta = resource as IDelta;
+            var delta = resource as IDelta;
             if (delta != null)
             {
                 object value;
@@ -333,7 +333,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                PropertyInfo property = resource.GetType().GetProperty(propertyName);
+                var property = resource.GetType().GetProperty(propertyName);
                 Contract.Assert(property != null, "ODataLib should have already verified that the property exists on the type.");
                 return property.GetValue(resource, index: null);
             }
@@ -351,9 +351,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     "ODataLib should have verified that dynamic collection value has a type name " +
                     "since we provided metadata.");
 
-                string elementTypeName = GetCollectionElementTypeName(collection.TypeName, isNested: false);
-                IEdmModel model = readContext.Model;
-                IEdmSchemaType elementType = model.FindType(elementTypeName);
+                var elementTypeName = GetCollectionElementTypeName(collection.TypeName, isNested: false);
+                var model = readContext.Model;
+                var elementType = model.FindType(elementTypeName);
                 Contract.Assert(elementType != null);
                 collectionType =
                     new EdmCollectionTypeReference(
@@ -366,7 +366,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 Contract.Assert(collectionType != null, "The type for collection must be a IEdmCollectionType.");
             }
 
-            ODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(collectionType);
+            var deserializer = deserializerProvider.GetEdmTypeDeserializer(collectionType);
             return deserializer.ReadInline(collection, collectionType, readContext);
         }
 
@@ -379,7 +379,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 // dynamic enum property
                 Contract.Assert(!String.IsNullOrEmpty(enumValue.TypeName),
                     "ODataLib should have verified that dynamic enum value has a type name since we provided metadata.");
-                IEdmModel model = readContext.Model;
+                var model = readContext.Model;
                 IEdmType edmType = model.FindType(enumValue.TypeName);
                 Contract.Assert(edmType.TypeKind == EdmTypeKind.Enum, "ODataLib should have verified that enum value has a enum resource type.");
                 edmEnumType = new EdmEnumTypeReference(edmType as IEdmEnumType, isNullable: true);
@@ -390,7 +390,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 edmEnumType = propertyType.AsEnum();
             }
 
-            ODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
+            var deserializer = deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
             return deserializer.ReadInline(enumValue, propertyType, readContext);
         }
 
@@ -398,7 +398,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         private static string GetCollectionElementTypeName(string typeName, bool isNested)
         {
             const string CollectionTypeQualifier = "Collection";
-            int collectionTypeQualifierLength = CollectionTypeQualifier.Length;
+            var collectionTypeQualifierLength = CollectionTypeQualifier.Length;
 
             // A collection type name must not be null, it has to start with "Collection(" and end with ")"
             // and must not be "Collection()"
@@ -412,7 +412,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     throw new ODataException(Error.Format(SRResources.NestedCollectionsNotSupported, typeName));
                 }
 
-                string innerTypeName = typeName.Substring(collectionTypeQualifierLength + 1,
+                var innerTypeName = typeName.Substring(collectionTypeQualifierLength + 1,
                     typeName.Length - (collectionTypeQualifierLength + 2));
 
                 // Check if it is not a nested collection and throw if it is

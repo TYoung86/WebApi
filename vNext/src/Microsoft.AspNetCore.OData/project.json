@@ -1,5 +1,5 @@
 {
-	"version": "6.0.0-alpha3-rtm",
+	"version": "1.0.0-alpha9",
 	"description": "Microsoft.AspNetCore.OData",
 
 	"dependencies": {
@@ -11,6 +11,9 @@
 
 	"frameworks": {
 		"netcoreapp1.0": {
+			"imports": [
+				"dnxcore50"
+			],
 			"dependencies": {
 				"Microsoft.NETCore.App": {
 					"version": "1.0.0",

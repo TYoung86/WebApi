@@ -37,13 +37,13 @@ namespace Microsoft.AspNetCore.OData.Builder.Conventions.Attributes
 
             if (!edmProperty.AddedExplicitly)
             {
-                StructuralPropertyConfiguration structuralProperty = edmProperty as StructuralPropertyConfiguration;
+                var structuralProperty = edmProperty as StructuralPropertyConfiguration;
                 if (structuralProperty != null)
                 {
                     structuralProperty.OptionalProperty = false;
                 }
 
-                NavigationPropertyConfiguration navigationProperty = edmProperty as NavigationPropertyConfiguration;
+                var navigationProperty = edmProperty as NavigationPropertyConfiguration;
                 if (navigationProperty != null && navigationProperty.Multiplicity != EdmMultiplicity.Many)
                 {
                     navigationProperty.Required();

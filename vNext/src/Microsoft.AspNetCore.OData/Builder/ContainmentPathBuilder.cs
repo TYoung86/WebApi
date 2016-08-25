@@ -42,8 +42,8 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             // Find the last navigation property segment.
             ODataPathSegment lastNavigationProperty = _segments.OfType<NavigationPropertySegment>().LastOrDefault();
-            List<ODataPathSegment> newSegments = new List<ODataPathSegment>();
-            foreach (ODataPathSegment segment in _segments)
+            var newSegments = new List<ODataPathSegment>();
+            foreach (var segment in _segments)
             {
                 newSegments.Add(segment);
                 if (segment == lastNavigationProperty)
@@ -66,13 +66,13 @@ namespace Microsoft.AspNetCore.OData.Builder
             // information for that navigation property.)
             _segments.Reverse();
             NavigationPropertySegment navigationPropertySegment = null;
-            List<ODataPathSegment> newSegments = new List<ODataPathSegment>();
-            foreach (ODataPathSegment segment in _segments)
+            var newSegments = new List<ODataPathSegment>();
+            foreach (var segment in _segments)
             {
                 navigationPropertySegment = segment as NavigationPropertySegment;
                 if (navigationPropertySegment != null)
                 {
-                    EdmNavigationSourceKind navigationSourceKind =
+                    var navigationSourceKind =
                         navigationPropertySegment.NavigationSource.NavigationSourceKind();
                     if ((navigationPropertySegment.NavigationProperty.TargetMultiplicity() == EdmMultiplicity.Many &&
                          navigationSourceKind == EdmNavigationSourceKind.EntitySet) ||
@@ -88,17 +88,17 @@ namespace Microsoft.AspNetCore.OData.Builder
             // Start the path with the navigation source of the navigation property found above.
             if (navigationPropertySegment != null)
             {
-                IEdmNavigationSource navigationSource = navigationPropertySegment.NavigationSource;
+                var navigationSource = navigationPropertySegment.NavigationSource;
                 Contract.Assert(navigationSource != null);
                 if (navigationSource.NavigationSourceKind() == EdmNavigationSourceKind.Singleton)
                 {
-                    SingletonSegment singletonSegment = new SingletonSegment((IEdmSingleton)navigationSource);
+                    var singletonSegment = new SingletonSegment((IEdmSingleton)navigationSource);
                     newSegments.Insert(0, singletonSegment);
                 }
                 else
                 {
                     Contract.Assert(navigationSource.NavigationSourceKind() == EdmNavigationSourceKind.EntitySet);
-                    EntitySetSegment entitySetSegment = new EntitySetSegment((IEdmEntitySet)navigationSource);
+                    var entitySetSegment = new EntitySetSegment((IEdmEntitySet)navigationSource);
                     newSegments.Insert(0, entitySetSegment);
                 }
             }
@@ -108,8 +108,8 @@ namespace Microsoft.AspNetCore.OData.Builder
 
         private void RemoveAllTypeCasts()
         {
-            List<ODataPathSegment> newSegments = new List<ODataPathSegment>();
-            foreach (ODataPathSegment segment in _segments)
+            var newSegments = new List<ODataPathSegment>();
+            foreach (var segment in _segments)
             {
                 if (!(segment is TypeSegment))
                 {
@@ -123,22 +123,22 @@ namespace Microsoft.AspNetCore.OData.Builder
         private void AddTypeCastsIfNecessary()
         {
             IEdmEntityType owningType = null;
-            List<ODataPathSegment> newSegments = new List<ODataPathSegment>();
-            foreach (ODataPathSegment segment in _segments)
+            var newSegments = new List<ODataPathSegment>();
+            foreach (var segment in _segments)
             {
-                NavigationPropertySegment navProp = segment as NavigationPropertySegment;
+                var navProp = segment as NavigationPropertySegment;
                 if (navProp != null && owningType != null &&
                     owningType.FindProperty(navProp.NavigationProperty.Name) == null)
                 {
                     // need a type cast
-                    TypeSegment typeCast = new TypeSegment(
+                    var typeCast = new TypeSegment(
                         navProp.NavigationProperty.DeclaringType,
                         navigationSource: null);
                     newSegments.Add(typeCast);
                 }
 
                 newSegments.Add(segment);
-                IEdmEntityType targetEntityType = GetTargetEntityType(segment);
+                var targetEntityType = GetTargetEntityType(segment);
                 if (targetEntityType != null)
                 {
                     owningType = targetEntityType;
@@ -152,19 +152,19 @@ namespace Microsoft.AspNetCore.OData.Builder
         {
             Contract.Assert(segment != null);
 
-            EntitySetSegment entitySetSegment = segment as EntitySetSegment;
+            var entitySetSegment = segment as EntitySetSegment;
             if (entitySetSegment != null)
             {
                 return entitySetSegment.EntitySet.EntityType();
             }
 
-            SingletonSegment singletonSegment = segment as SingletonSegment;
+            var singletonSegment = segment as SingletonSegment;
             if (singletonSegment != null)
             {
                 return singletonSegment.Singleton.EntityType();
             }
 
-            NavigationPropertySegment navigationPropertySegment = segment as NavigationPropertySegment;
+            var navigationPropertySegment = segment as NavigationPropertySegment;
             if (navigationPropertySegment != null)
             {
                 return navigationPropertySegment.NavigationSource.EntityType();

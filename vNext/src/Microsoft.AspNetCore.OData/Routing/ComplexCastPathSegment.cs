@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             if (pathSegment.SegmentKind == ODataSegmentKinds.ComplexCast)
             {
-                ComplexCastPathSegment castSegment = (ComplexCastPathSegment)pathSegment;
+                var castSegment = (ComplexCastPathSegment)pathSegment;
                 return castSegment.CastType == CastType && castSegment.CastTypeName == CastTypeName;
             }
 

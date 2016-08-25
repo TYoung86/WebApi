@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull("queryOptionParser");
             }
 
-            IEdmEntityType entityType = context.ElementType as IEdmEntityType;
+            var entityType = context.ElementType as IEdmEntityType;
             if (entityType == null)
             {
                 throw Error.Argument("context", SRResources.SelectNonEntity, context.ElementType.ToTraceString());
@@ -93,7 +93,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.Argument(SRResources.SelectExpandEmptyOrNull);
             }
 
-            IEdmEntityType entityType = context.ElementType as IEdmEntityType;
+            var entityType = context.ElementType as IEdmEntityType;
             if (entityType == null)
             {
                 throw Error.Argument("context", SRResources.SelectNonEntity, context.ElementType.ToTraceString());
@@ -210,7 +210,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             // Ensure we have decided how to handle null propagation
-            ODataQuerySettings updatedSettings = settings;
+            var updatedSettings = settings;
             if (settings.HandleNullPropagation == HandleNullPropagationOption.Default)
             {
                 updatedSettings = new ODataQuerySettings(updatedSettings);
@@ -254,7 +254,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             // Ensure we have decided how to handle null propagation
-            ODataQuerySettings updatedSettings = settings;
+            var updatedSettings = settings;
             if (settings.HandleNullPropagation == HandleNullPropagationOption.Default)
             {
                 updatedSettings = new ODataQuerySettings(updatedSettings);
@@ -304,7 +304,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             // Process $levels in SelectItems of SelectExpandClause.
-            IEnumerable<SelectItem> selectItems = ProcessLevels(
+            var selectItems = ProcessLevels(
                 selectExpandClause.SelectedItems,
                 levelsMaxLiteralExpansionDepth,
                 out levelsEncountered,
@@ -336,9 +336,9 @@ namespace Microsoft.AspNetCore.OData.Query
             isMaxLevel = false;
             IList<SelectItem> items = new List<SelectItem>();
 
-            foreach (SelectItem selectItem in selectItems)
+            foreach (var selectItem in selectItems)
             {
-                ExpandedNavigationSelectItem item = selectItem as ExpandedNavigationSelectItem;
+                var item = selectItem as ExpandedNavigationSelectItem;
 
                 if (item == null)
                 {
@@ -350,7 +350,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     bool levelsEncouteredInExpand;
                     bool isMaxLevelInExpand;
                     // Process $levels in ExpandedNavigationSelectItem.
-                    ExpandedNavigationSelectItem expandItem = ProcessLevels(
+                    var expandItem = ProcessLevels(
                         item,
                         levelsMaxLiteralExpansionDepth,
                         out levelsEncouteredInExpand,
@@ -419,8 +419,8 @@ namespace Microsoft.AspNetCore.OData.Query
             ExpandedNavigationSelectItem item = null;
             SelectExpandClause currentSelectExpandClause = null;
             SelectExpandClause selectExpandClause = null;
-            bool levelsEncounteredInInnerExpand = false;
-            bool isMaxLevelInInnerExpand = false;
+            var levelsEncounteredInInnerExpand = false;
+            var isMaxLevelInInnerExpand = false;
 
             // Try diffent expansion depth until expandItem.SelectAndExpand is successfully expanded
             while (selectExpandClause == null && level > 0)
@@ -457,11 +457,11 @@ namespace Microsoft.AspNetCore.OData.Query
                 else
                 {
                     // PathSelectItem is needed for the expanded item if AllSelected is false. 
-                    PathSelectItem pathSelectItem = new PathSelectItem(
+                    var pathSelectItem = new PathSelectItem(
                         new ODataSelectPath(expandItem.PathToNavigationProperty));
 
                     // Keep default SelectItems before expanded item to keep consistent with normal SelectExpandClause 
-                    SelectItem[] items = new SelectItem[] { item, pathSelectItem };
+                    var items = new SelectItem[] { item, pathSelectItem };
                     currentSelectExpandClause = new SelectExpandClause(
                         new SelectItem[] { }.Concat(selectExpandClause.SelectedItems).Concat(items),
                         selectExpandClause.AllSelected);

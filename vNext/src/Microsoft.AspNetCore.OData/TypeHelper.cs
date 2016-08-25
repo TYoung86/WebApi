@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData
                 return false;
             }
 
-            Type collectionInterface
+            var collectionInterface
                 = type.GetInterfaces()
                     .Union(new[] { type })
                     .FirstOrDefault(
@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.OData
 
         public static bool IsEnum(Type type)
         {
-            Type underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(type);
+            var underlyingTypeOrSelf = GetUnderlyingTypeOrSelf(type);
             return underlyingTypeOrSelf.GetTypeInfo().IsEnum;
         }
 
@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.OData
 
             while (true)
             {
-                Type nullableUnderlyingType = Nullable.GetUnderlyingType(type);
+                var nullableUnderlyingType = Nullable.GetUnderlyingType(type);
                 if (nullableUnderlyingType != null)
                 {
                     type = nullableUnderlyingType;
@@ -158,8 +158,8 @@ namespace Microsoft.AspNetCore.OData
             else
             {
                 // for the rest of interfaces and strongly Type collections
-                Type[] interfaces = type.GetInterfaces();
-                foreach (Type interfaceType in interfaces)
+                var interfaces = type.GetInterfaces();
+                foreach (var interfaceType in interfaces)
                 {
                     if (interfaceType.GetTypeInfo().IsGenericType &&
                         (interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
@@ -178,11 +178,11 @@ namespace Microsoft.AspNetCore.OData
         // This code is copied from DefaultHttpControllerTypeResolver.GetControllerTypes.
         internal static IEnumerable<Type> GetLoadedTypes(IAssemblyProvider assembliesResolver)
         {
-            List<Type> result = new List<Type>();
+            var result = new List<Type>();
 
             // Go through all assemblies referenced by the application and search for types matching a predicate
-            IEnumerable<Assembly> assemblies = assembliesResolver.CandidateAssemblies;
-            foreach (Assembly assembly in assemblies)
+            var assemblies = assembliesResolver.CandidateAssemblies;
+            foreach (var assembly in assemblies)
             {
                 Type[] exportedTypes = null;
                 if (assembly == null || assembly.IsDynamic)
@@ -216,7 +216,7 @@ namespace Microsoft.AspNetCore.OData
         private static Type GetInnerGenericType(Type interfaceType)
         {
             // Getting the type T definition if the returning type implements IEnumerable<T>
-            Type[] parameterTypes = interfaceType.GetGenericArguments();
+            var parameterTypes = interfaceType.GetGenericArguments();
 
             if (parameterTypes.Length == 1)
             {
